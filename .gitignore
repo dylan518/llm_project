@@ -1,0 +1,21 @@
+# Virtual environment
+venv/
+env/
+myenv/
+*.venv/
+*.env/
+*.myenv/
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# If you are using Jupyter notebooks
+.ipynb_checkpoints/
+
+# If you are using macOS
+.DS_Store
+
+# If you are using SQLite
+*.sqlite

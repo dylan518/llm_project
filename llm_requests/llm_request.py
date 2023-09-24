@@ -3,47 +3,44 @@ import json
 import time
 from langchain import OpenAI
 
-REQUEST_LIMIT_FILE = "request_limit.txt"
-
-
-def read_request_limit():
-    try:
-        with open(REQUEST_LIMIT_FILE, 'r') as file:
-            return int(file.read().strip())
-    except:
-        print(
-            "Error reading request limit or no value given. Terminating process."
-        )
-        os._exit(1)
-
-
-def decrement_request_limit():
-    try:
-        current_limit = read_request_limit()
-        with open(REQUEST_LIMIT_FILE, 'w') as file:
-            file.write(str(current_limit - 1))
-    except:
-        print("Error decrementing request limit. Terminating process.")
-        os._exit(1)
-
 
 class LLMRequester:
+
+    REQUEST_LIMIT_FILE = "request_limit.txt"
+
+    @staticmethod
+    def read_request_limit():
+        try:
+            with open(LLMRequester.REQUEST_LIMIT_FILE, 'r') as file:
+                return int(file.read().strip())
+        except:
+            print(
+                "Error reading request limit or no value given. Terminating process."
+            )
+            os._exit(1)
+
+    @staticmethod
+    def decrement_request_limit():
+        try:
+            current_limit = LLMRequester.read_request_limit()
+            with open(LLMRequester.REQUEST_LIMIT_FILE, 'w') as file:
+                file.write(str(current_limit - 1))
+        except:
+            print("Error decrementing request limit. Terminating process.")
+            os._exit(1)
 
     def __init__(self):
         self.interactions = []
 
         try:
-            # Initialize LLMs with a temperature of 0
             openai_key = os.environ.get("OPENAI_KEY")
             if not openai_key:
                 raise ValueError("OPENAI_KEY environment variable not set.")
 
-            # Initialize GPT-3.5 model
             self.llm_gpt3 = OpenAI(openai_api_key=str(openai_key),
                                    temperature=0,
                                    model_name='gpt-3.5-turbo')
 
-            # Initialize GPT-4 model
             self.llm_gpt4 = OpenAI(openai_api_key=openai_key,
                                    temperature=0,
                                    model_name='gpt-4.0-turbo')
@@ -53,10 +50,10 @@ class LLMRequester:
 
     def request(self, model, prompt, retries=3, delay=10):
         for _ in range(retries):
-            if read_request_limit() <= 0:
+            if self.read_request_limit() <= 0:
                 print("Request limit reached. Terminating process.")
                 os._exit(1)
-            decrement_request_limit()
+            self.decrement_request_limit()
             try:
                 if model == "gpt3":
                     response = self.llm_gpt3.generate([prompt])

@@ -1,15 +1,19 @@
 import os
 import subprocess
 import sys
+import multiprocessing
 
 
 class EnvironmentManager:
 
     def __init__(self):
+        self.PROJECT_DIRECTORY = "/Users/dylanwilson/Documents/GitHub/llm_project/"
         self.ENV_NAME = "myenv"
-        self.REQUIREMENTS_FILE = "requirements.txt"
-        self.IMPORTS_FILE = "import.txt"
+        self.REQUIREMENTS_FILE = self.PROJECT_DIRECTORY + "/enviroment_setup_and_run/requirements.txt"
+        self.IMPORTS_FILE = self.PROJECT_DIRECTORY + "/enviroment_setup_and_run/import.txt"
         self.outputs = {}
+
+        os.chdir(self.PROJECT_DIRECTORY)
 
     def run_command(self, command, capture_output=True):
         result = subprocess.run(command,
@@ -19,6 +23,7 @@ class EnvironmentManager:
         if result.stderr:
             print(f"Error executing command: {command}")
             print(result.stderr)
+            print(result.stdout)
         return result.stdout
 
     def create_virtual_env(self):
@@ -34,8 +39,12 @@ class EnvironmentManager:
             package.split('==')[0].lower() for package in output.splitlines())
 
     def get_required_packages(self):
-        with open(self.REQUIREMENTS_FILE, 'r') as f:
-            return set(line.strip().lower() for line in f)
+        try:
+            with open(self.REQUIREMENTS_FILE, 'r') as f:
+                return set(line.strip().lower() for line in f)
+
+        except:
+            print("cant get requirements file")
 
     def install_missing_packages(self, missing_packages):
         venv_python = os.path.join(self.ENV_NAME, 'bin', 'python')
@@ -52,16 +61,15 @@ class EnvironmentManager:
             except Exception as e:
                 print(f"Failed to execute {line.strip()}. Error: {e}")
 
-   def run_script(self, script_name, time_limit=None, request_limit=None):
+    def run_script(self, script_name, time_limit=None, request_limit=None):
         venv_python = os.path.join(self.ENV_NAME, 'bin', 'python')
-        
-        # Set request limit if provided
         if request_limit:
             with open("request_limit.txt", 'w') as f:
                 f.write(str(request_limit))
 
         # Use multiprocessing to run the script and terminate it after the time limit
-        process = multiprocessing.Process(target=subprocess.run, args=([venv_python, script_name],))
+        process = multiprocessing.Process(target=subprocess.run,
+                                          args=([venv_python, script_name], ))
         process.start()
         process.join(timeout=time_limit)
         if process.is_alive():
@@ -70,7 +78,9 @@ class EnvironmentManager:
             process.join()
 
         # Capture the output (assuming you want to capture it after the process is terminated)
-        result = subprocess.run([venv_python, script_name], capture_output=True, text=True)
+        result = subprocess.run([venv_python, script_name],
+                                capture_output=True,
+                                text=True)
         self.outputs[script_name] = result.stdout
         return result
 
@@ -86,13 +96,19 @@ class EnvironmentManager:
 
         self.execute_imports()
 
-    def main(self, scripts):
+    def setup_and_run(self, scripts, time_limit, request_limit):
         self.setup_environment()
-
-        for script in scripts:
-            print(f"Running {script}...")
-            self.run_script(script)
-            print(f"Output for {script} saved.")
+        if isinstance(scripts, str):
+            print(f"Running {self.PROJECT_DIRECTORY+scripts}...")
+            self.run_script(scripts, time_limit, request_limit)
+            print(f"Output for {scripts} saved.")
+        elif isinstance(scripts, list):
+            for script in scripts:
+                print(f"Running {script}...")
+                self.run_script(script, time_limit, request_limit)
+                print(f"Output for {self.PROJECT_DIRECTORY+script} saved.")
+        else:
+            print("unexpected type")
 
         print("All scripts executed.")
 

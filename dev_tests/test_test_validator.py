@@ -1,7 +1,13 @@
 import unittest
 from unittest.mock import patch, Mock
-from test_validator import TestValidator
 import os
+import sys
+
+project_directory = "/Users/dylanwilson/Documents/GitHub/llm_project
+module_directories=["main", "llm_requests","enviroment_setup_and_run","running_tests","logging"]
+for dir in module_directories:
+    sys.path.append(project_directory+dir)
+from test_validator import TestValidator
 
 
 class TestTestValidator(unittest.TestCase):

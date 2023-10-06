@@ -1,6 +1,16 @@
 import unittest
 import os
-from backup_manager import BackupManager
+import sys
+
+# Get the directory containing the current test file.
+current_directory = os.path.dirname(os.path.abspath(__file__))
+
+# Compute the path to the directory containing the modules.
+# Adjust the path based on the test file's needs.
+module_directory = os.path.join(current_directory, '..', 'running_tests')
+
+# Append this path to sys.path.
+sys.path.append(module_directory)
 
 
 class TestBackupManager(unittest.TestCase):

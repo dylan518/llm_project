@@ -1,6 +1,17 @@
 import unittest
 from unittest.mock import patch, Mock
-from llm_request import LLMRequester
+import sys
+import os
+
+# Get the directory containing the current test file.
+current_directory = os.path.dirname(os.path.abspath(__file__))
+
+# Compute the path to the directory containing the modules.
+# Adjust the path based on the test file's needs.
+module_directory = os.path.join(current_directory, '..', 'llm_requests')
+
+# Append this path to sys.path.
+sys.path.append(module_directory)
 
 
 class TestLLMRequester(unittest.TestCase):

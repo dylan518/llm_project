@@ -1,73 +1,57 @@
 import os
 import subprocess
 import sys
+import unittest
 
-# Mock requirements and imports
-MOCK_REQUIREMENTS = """
-numpy
-pandas
-requests
-"""
+# Get the directory containing the current test file.
+current_directory = os.path.dirname(os.path.abspath(__file__))
 
-MOCK_IMPORTS = """
-import numpy
-import pandas
-import requests
-"""
+# Compute the path to the directory containing the modules.
+# Adjust the path based on the test file's needs.
+module_directory = os.path.join(current_directory, '..',
+                                'enviroment_setup_and_run')
 
-MOCK_CODE = """
-print("code.py executed successfully!")
-"""
-
-# Paths
-TEST_REQUIREMENTS_FILE = "test_requirements.txt"
-TEST_IMPORTS_FILE = "test_import.txt"
-ENV_NAME = "myenv"
-CODE_FILE = "code.py"
+# Append this path to sys.path.
+sys.path.append(module_directory)
 
 
-def create_mock_files():
-    with open(TEST_REQUIREMENTS_FILE, 'w') as f:
-        f.write(MOCK_REQUIREMENTS)
+class TestEnvironmentManager(unittest.TestCase):
 
-    with open(TEST_IMPORTS_FILE, 'w') as f:
-        f.write(MOCK_IMPORTS)
+    def setUp(self):
+        self.manager = EnvironmentManager()
 
-    with open(CODE_FILE, 'w') as f:
-        f.write(MOCK_CODE)
+    def test_create_virtual_env(self):
+        self.manager.create_virtual_env()
+        self.assertTrue(os.path.exists(self.manager.ENV_NAME))
 
+    def test_install_missing_packages(self):
+        # Assuming 'requests' is in your requirements.txt
+        self.manager.install_missing_packages(['requests'])
+        installed_packages = self.manager.get_installed_packages()
+        self.assertIn('requests', installed_packages)
 
-def run_setup_script():
-    result = subprocess.run(
-        [sys.executable, "setup_environment.py", CODE_FILE],
-        capture_output=True,
-        text=True)
-    # Return both stdout and stderr for better debugging
-    return result.stdout + "\n" + result.stderr
+    def test_execute_imports(self):
+        # Assuming 'import os' is in your import.txt
+        self.manager.execute_imports()
+        # If no exception is raised, the test will pass
 
+    def test_run_script(self):
+        # Create a simple script for testing
+        with open('test_script.py', 'w') as f:
+            f.write("print('Hello from test_script')")
 
-def test_environment():
-    # Check if environment directory exists
-    assert os.path.exists(ENV_NAME), f"{ENV_NAME} was not created."
+        self.manager.run_script('test_script.py')
+        output = self.manager.get_output('test_script.py')
+        self.assertEqual(output.strip(), 'Hello from test_script')
 
-    # Check if test_requirements.txt and test_import.txt were processed
-    assert os.path.exists(
-        TEST_REQUIREMENTS_FILE), f"{TEST_REQUIREMENTS_FILE} does not exist."
-    assert os.path.exists(
-        TEST_IMPORTS_FILE), f"{TEST_IMPORTS_FILE} does not exist."
-
-    # Check if code.py was executed successfully
-    output = run_setup_script()
-    print(f"Output from run_setup_script: {output}")
-    assert "code.py executed successfully!" in output, "code.py was not executed or did not produce expected output."
-
-    print("All tests passed!")
-
-
-def main():
-    create_mock_files()
-    test_environment()
+    def tearDown(self):
+        # Clean up any files or directories created during testing
+        if os.path.exists('test_script.py'):
+            os.remove('test_script.py')
+        if os.path.exists(self.manager.ENV_NAME):
+            os.rmdir(self.manager.ENV_NAME
+                     )  # Note: This will only remove an empty directory
 
 
 if __name__ == "__main__":
-    main()
+    unittest.main()

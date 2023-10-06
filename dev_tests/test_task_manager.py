@@ -1,6 +1,21 @@
+import os
+import sys
 import unittest
 from unittest.mock import patch, mock_open
+
+project_directory = "/Users/dylanwilson/Documents/GitHub/llm_project/"
+module_directories = [
+    "main", "llm_requests", "enviroment_setup_and_run", "running_tests",
+    "logging"
+]
+
+for dir in module_directories:
+    sys.path.append(project_directory + dir)
+
 from task_manager import TaskManager
+from setup_and_run import EnvironmentManager
+
+os.chdir(project_directory)
 
 
 class TestTaskManager(unittest.TestCase):
@@ -41,7 +56,7 @@ class TestTaskManager(unittest.TestCase):
                                               'w')
             mock_file().write.assert_called_once_with(target)
 
-    @patch("task_manager.EnvironmentManager")
+    @patch("setup_and_run.EnvironmentManager")
     def test_run_self_improvement_loop(self, MockEnvironmentManager):
         """Test the run_self_improvement_loop method."""
         self.manager.run_self_improvement_loop()

@@ -1,4 +1,3 @@
---upgrade pip
 openai
 requests
 beautifulsoup4
@@ -46,7 +45,6 @@ rabbitmq
 pyyaml
 jsonschema
 click
-argparse
 pillow
 opencv-python
 ffmpeg-python
@@ -110,7 +108,6 @@ rabbitmq
 pyyaml
 jsonschema
 click
-argparse
 pillow
 opencv-python
 ffmpeg-python

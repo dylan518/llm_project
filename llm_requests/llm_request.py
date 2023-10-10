@@ -1,12 +1,14 @@
 import os
 import json
 import time
-from langchain import OpenAI
+from langchain.llms import OpenAI
 
 
 class LLMRequester:
 
     REQUEST_LIMIT_FILE = "request_limit.txt"
+    os.environ[
+        'OPENAI_API_KEY'] = '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'
 
     @staticmethod
     def read_request_limit():
@@ -33,17 +35,21 @@ class LLMRequester:
         self.interactions = []
 
         try:
-            openai_key = os.environ.get("OPENAI_KEY")
+            openai_key = os.environ.get("OPENAI_API_KEY")
             if not openai_key:
                 raise ValueError("OPENAI_KEY environment variable not set.")
+            self.llm_gpt3 = OpenAI(
+                openai_api_key=os.environ.get('OPENAI_API_KEY'),
+                temperature=0,
+                model_name='gpt-3.5-turbo')
 
-            self.llm_gpt3 = OpenAI(openai_api_key=str(openai_key),
-                                   temperature=0,
-                                   model_name='gpt-3.5-turbo')
+            self.llm_gpt4 = OpenAI(
+                openai_api_key=os.environ.get('OPENAI_API_KEY'),
+                temperature=0,
+                model_name='gpt-4')
 
-            self.llm_gpt4 = OpenAI(openai_api_key=openai_key,
-                                   temperature=0,
-                                   model_name='gpt-4.0-turbo')
+
+#            print(dir(self.llm_gpt4))
         except Exception as e:
             print(f"Error initializing LLMs: {str(e)}")
             raise
@@ -86,13 +92,12 @@ class LLMRequester:
         except Exception as e:
             print(f"Error saving interactions: {str(e)}")
 
-
 if __name__ == "__main__":
     requester = LLMRequester()
     prompt = "Translate the following English text to French: 'Hello, how are you?'"
 
-    response_gpt3 = requester.request("gpt3", prompt)
-    response_gpt4 = requester.request("gpt4", prompt)
+    response_gpt3 = requester.request("gpt3", prompt, 1)
+    response_gpt4 = requester.request("gpt4", prompt, 1)
 
     print("GPT-3.5 Response:", response_gpt3)
     print("GPT-4 Response:", response_gpt4)

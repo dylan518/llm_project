@@ -14,6 +14,7 @@ class TaskManager:
     def __init__(self,
                  task_file_path="self_improvement/task.txt",
                  target_file_path="self_improvement/self_improve.py"):
+        self.project_directory = "/Users/dylanwilson/Documents/GitHub/llm_project"
         self.task_file_path = task_file_path
         self.target_file_path = target_file_path
 
@@ -38,8 +39,9 @@ class TaskManager:
 
     def run_self_improvement_loop(self, time_limit=None, request_limit=None):
         env_manager = EnvironmentManager()
-        env_manager.setup_and_run("/self_improvement/self_improve.py",
-                                  time_limit, request_limit)
+        print(env_manager)
+        env_manager.setup_and_run(self.target_file_path, time_limit,
+                                  request_limit)
 
 
 # Example usage:

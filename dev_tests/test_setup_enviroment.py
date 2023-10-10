@@ -1,18 +1,22 @@
 import os
 import subprocess
 import sys
+import shutil
 import unittest
 
-# Get the directory containing the current test file.
-current_directory = os.path.dirname(os.path.abspath(__file__))
+project_directory = "/Users/dylanwilson/Documents/GitHub/llm_project/"
+module_directories = [
+    "main", "llm_requests", "enviroment_setup_and_run", "running_tests",
+    "logging"
+]
 
-# Compute the path to the directory containing the modules.
-# Adjust the path based on the test file's needs.
-module_directory = os.path.join(current_directory, '..',
-                                'enviroment_setup_and_run')
+for dir in module_directories:
+    sys.path.append(project_directory + dir)
 
-# Append this path to sys.path.
-sys.path.append(module_directory)
+from task_manager import TaskManager
+from setup_and_run import EnvironmentManager
+
+os.chdir(project_directory)
 
 
 class TestEnvironmentManager(unittest.TestCase):
@@ -29,6 +33,13 @@ class TestEnvironmentManager(unittest.TestCase):
         self.manager.install_missing_packages(['requests'])
         installed_packages = self.manager.get_installed_packages()
         self.assertIn('requests', installed_packages)
+
+    def test_setup_environment(self):
+        self.manager.setup_environment()
+        installed_packages = self.manager.get_installed_packages()
+        required_packages = self.manager.get_required_packages()
+        for package in required_packages:
+            self.assertIn(package, installed_packages)
 
     def test_execute_imports(self):
         # Assuming 'import os' is in your import.txt
@@ -48,10 +59,11 @@ class TestEnvironmentManager(unittest.TestCase):
         # Clean up any files or directories created during testing
         if os.path.exists('test_script.py'):
             os.remove('test_script.py')
-        if os.path.exists(self.manager.ENV_NAME):
-            os.rmdir(self.manager.ENV_NAME
-                     )  # Note: This will only remove an empty directory
 
+
+#        if os.path.exists(self.manager.ENV_NAME):
+#            shutil.rmtree(self.manager.ENV_NAME
+#                          )  # Note: This will only remove an empty directory
 
 if __name__ == "__main__":
     unittest.main()

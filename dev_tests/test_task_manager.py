@@ -10,12 +10,12 @@ module_directories = [
 ]
 
 for dir in module_directories:
-    sys.path.append(project_directory + dir)
+    sys.path.append(os.path.join(project_directory, dir))
 
 from task_manager import TaskManager
 from setup_and_run import EnvironmentManager
 
-os.chdir(project_directory)
+#os.chdir(project_directory)
 
 
 class TestTaskManager(unittest.TestCase):
@@ -56,12 +56,13 @@ class TestTaskManager(unittest.TestCase):
                                               'w')
             mock_file().write.assert_called_once_with(target)
 
-    @patch("setup_and_run.EnvironmentManager")
-    def test_run_self_improvement_loop(self, MockEnvironmentManager):
+    def test_run_self_improvement_loop(self):
         """Test the run_self_improvement_loop method."""
-        self.manager.run_self_improvement_loop()
-        MockEnvironmentManager.assert_called_once()
-        MockEnvironmentManager().setup_and_run.assert_called_once()
+        with unittest.mock.patch(
+                'task_manager.EnvironmentManager') as MockEnvironmentManager:
+            self.manager.run_self_improvement_loop()
+            MockEnvironmentManager.assert_called_once()
+            MockEnvironmentManager().setup_and_run.assert_called_once()
 
 
 if __name__ == "__main__":

@@ -4,7 +4,7 @@ import sys
 project_directory = "/Users/dylanwilson/Documents/GitHub/llm_project/"
 module_directories = [
     "main", "llm_requests", "enviroment_setup_and_run", "running_tests",
-    "logging"
+    "logging", "self_improvement"
 ]
 
 

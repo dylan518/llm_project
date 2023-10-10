@@ -27,10 +27,10 @@ class BackupManager:
                 pass  # Create an empty __init__.py file
         return backup_path
 
-    def restore_directory(self, backup_path):
+    def restore_directory(self):
         if os.path.exists(self.TARGET_DIR):
             shutil.rmtree(self.TARGET_DIR)
-        shutil.copytree(backup_path, self.TARGET_DIR)
+        shutil.copytree(self.BACKUP_DIR, self.TARGET_DIR)
 
     def get_last_good_version(self):
         if os.path.exists(self.LAST_GOOD_VERSION):

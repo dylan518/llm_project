@@ -3,15 +3,25 @@ from unittest.mock import MagicMock, patch
 import sys
 import os
 
-# Get the directory containing the current test file.
-current_directory = os.path.dirname(os.path.abspath(__file__))
+import unittest
+import os
+import sys
+import shutil  # Import shutil for rmtree
 
-# Compute the path to the directory containing the modules.
-# Adjust the path based on the test file's needs.
-module_directory = os.path.join(current_directory, '..', 'main')
+project_directory = "/Users/dylanwilson/Documents/GitHub/llm_project/"
 
-# Append this path to sys.path.
-sys.path.append(module_directory)
+module_directories = [
+    "main", "llm_requests", "enviroment_setup_and_run", "running_tests",
+    "logging"
+]
+for dir in module_directories:
+    sys.path.append(project_directory + dir)
+from test_validator import TestValidator
+from manage_backups import BackupManager
+from main import Main
+from llm_request import LLMRequester
+from task_manager import TaskManager
+from setup_and_run import EnvironmentManager
 
 
 class TestMain(unittest.TestCase):

@@ -1,13 +1,20 @@
 import os
+import unittest
+import sys
+import shutil  # Import shutil for rmtree
 
-#TARGET_DIR = "self_improvement"
-#REQUEST_LIMIT_FILE = os.path.join("llm_requests", "request_limit.txt")
-#TASK_FILE = os.path.join(TARGET_DIR, "task.txt")
-#TARGET_PATH = "target_code.py"
-#BACKUP_DIR = "backup_versions"
-#LAST_GOOD_VERSION = "last_good_version.txt"
-#VERSION_LOG = "version_log.txt"
-#LOCAL_TASK = "self_improve_task.txt"
+project_directory = "/Users/dylanwilson/Documents/GitHub/llm_project/"
+module_directories = ["enviroment_setup_and_run", "running_tests", "logging"]
+
+for dir in module_directories:
+    sys.path.append(os.path.join(project_directory, dir))  # Use os.path.join
+
+from manage_backups import BackupManager
+from test_validator import TestValidator
+from manage_backups import BackupManager
+from llm_request import LLMRequester
+from task_manager import TaskManager
+from setup_and_run import EnvironmentManager
 
 
 class Main:
@@ -17,40 +24,46 @@ class Main:
         self.task_manager = TaskManager()
         self.env_manager = EnvironmentManager()
         self.test_validator = TestValidator()
+        self.back_up_dir = self.backup_manager.BACKUP_DIR
+        self.project_directory = "/Users/dylanwilson/Documents/GitHub/llm_project/"
+        print(self.back_up_dir)
 
     def run(self):
         # Get the list of all backups sorted by creation time (oldest first)
-        all_backups = sorted(os.listdir("backup_versions"))
+        self.backup_manager.backup_directory()
+        # Run the self-improvement loop
+        self.task_manager.run_self_improvement_loop(time_limit=3600,
+                                                    request_limit=10)
+        #read test instruction to test_task
+        task_file_path = "/running_tests/tasks/test_task0.txt"
+        with open(task_file_path, 'r') as task_file:
+            test_task = task_file.read()
 
-        for backup in all_backups:
-            # Restore the backup
-            self.backup_manager.restore_directory(
-                os.path.join("backup_versions", backup))
+        self.task_manager.update_task(test_task)
+        self.task_manager.set_target_file(
+            os.path.join(project_directory, "/self_improvement/test_file.py"))
 
-            # Run the self-improvement loop
-            self.task_manager.run_self_improvement_loop(time_limit=3600,
-                                                        request_limit=10)
+        #have self improvement loop complete test task
+        self.task_manager.run_self_improvement_loop(time_limit=3600,
+                                                    request_limit=3)
+        # Test the results
+        test_passed = self.test_validator.validate(
+            "unittest0.py", os.path.join("self_improvement",
+                                         "self_improve.py"))
 
-            # Test the results
-            test_passed = self.test_validator.run_tests(
-                "unittest0.py",
-                os.path.join("self_improvement", "self_improve.py"))
-
-            # If tests failed, restore the last good version
-            if not test_passed:
-                last_good_version = self.backup_manager.get_last_good_version()
-                if last_good_version:
-                    self.backup_manager.restore_directory(last_good_version)
-                    print(
-                        f"Restored to the last good version ({last_good_version}) due to test failure."
-                    )
-                else:
-                    # If no last good version is found, restore to the very first backup
-                    self.backup_manager.restore_directory(
-                        os.path.join("backup_versions", all_backups[0]))
-                    print(
-                        "Restored to the very first backup due to test failure."
-                    )
+        # If tests failed, restore the last good version
+        if not test_passed:
+            last_good_version = self.backup_manager.get_last_good_version()
+            if last_good_version:
+                self.backup_manager.restore_directory(last_good_version)
+                print(
+                    f"Restored to the last good version ({last_good_version}) due to test failure."
+                )
+            else:
+                # If no last good version is found, restore to the very first backup
+                self.backup_manager.restore_directory(
+                    os.path.join("backup_versions", all_backups[0]))
+                print("Restored to the very first backup due to test failure.")
 
 
 if __name__ == "__main__":

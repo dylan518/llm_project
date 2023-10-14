@@ -33,7 +33,7 @@ class Main:
         self.backup_manager.backup_directory()
         # Run the self-improvement loop
         self.task_manager.run_self_improvement_loop(time_limit=3600,
-                                                    request_limit=10)
+                                                    request_limit=5)
         #read test instruction to test_task
         task_file_path = "/running_tests/tasks/test_task0.txt"
         with open(task_file_path, 'r') as task_file:
@@ -48,22 +48,8 @@ class Main:
                                                     request_limit=3)
         # Test the results
         test_passed = self.test_validator.validate(
-            "unittest0.py", os.path.join("self_improvement",
-                                         "self_improve.py"))
-
-        # If tests failed, restore the last good version
-        if not test_passed:
-            last_good_version = self.backup_manager.get_last_good_version()
-            if last_good_version:
-                self.backup_manager.restore_directory(last_good_version)
-                print(
-                    f"Restored to the last good version ({last_good_version}) due to test failure."
-                )
-            else:
-                # If no last good version is found, restore to the very first backup
-                self.backup_manager.restore_directory(
-                    os.path.join("backup_versions", all_backups[0]))
-                print("Restored to the very first backup due to test failure.")
+            "unittest0.py",
+            os.path.join(project_directory, "/self_improvement/test_file.py"))
 
 
 if __name__ == "__main__":

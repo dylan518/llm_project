@@ -41,6 +41,9 @@ class TestValidator:
         """
         Run the tests in the given test file against the code in code_file and return a boolean indicating success or failure.
         """
+        # Setup environment
+        self.env_manager.setup_environment()
+
         # Add the directory containing the code_file to the system path
         sys.path.append(os.path.dirname(os.path.abspath(code_file)))
 

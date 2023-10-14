@@ -1,16 +1,3 @@
-class FileHandler:
-    """Class to handle file operations for reading task and target file."""
-
-    @staticmethod
-    def read_file(filepath):
-        try:
-            with open(filepath, 'r') as file:
-                return file.read()
-        except Exception as e:
-            print(f"Error reading file {filepath}: {str(e)}")
-            return None
-
-
 def generate_and_run_tests(function_code):
     """
     Generates unit tests for the given function using GPT and runs them.
@@ -77,6 +64,73 @@ def shorten_messages(messages, max_chars=50000):
     return messages
 
 
+#extracts python code from gpt output
+def extract_python_code(gpt_output):
+    try:
+        python_code_blocks = re.findall(r'```python(.*?)```', gpt_output,
+                                        re.DOTALL)
+
+        # Remove leading/trailing whitespace from each code block
+        python_code_blocks = [code.strip() for code in python_code_blocks]
+
+        print(python_code_blocks)
+
+        return python_code_blocks
+    except Exception as e:
+        print(f"An error occurred while extracting Python code: {str(e)}")
+        print("nothing parsed")
+        return None
+
+
+#updates code in self_improve_simple.py
+def update_code(func):
+    """
+    Updates the code in self_improve_simple.py with the new function.
+    """
+    try:
+        tree = ast.parse(func)
+        for node in tree.body:
+            if isinstance(node, ast.FunctionDef):
+                func_name = node.name
+                # Open the file and read the current code
+                with open("self_improve_simple.py", "r") as file:
+                    data = file.readlines()
+
+                # Find the start and end of the existing function definition
+                func_start = None
+                func_end = None
+                indent_level = None
+                for index, line in enumerate(data):
+                    stripped = line.lstrip()
+                    indent = len(line) - len(stripped)
+
+                    if stripped.startswith(f"def {func_name}"):
+                        func_start = index
+                        indent_level = indent
+                    elif func_start is not None and indent <= indent_level and stripped:
+                        func_end = index
+                        break
+
+                # If function exists, remove it
+                if func_start is not None:
+                    if func_end is not None:  # End of function found
+                        data = data[:func_start] + data[func_end:]
+                    else:  # End of function not found (function is at end of file)
+                        data = data[:func_start]
+
+                # Append new function at the end
+                data.append('\n' + func + '\n')
+
+                # Write the updated code back to the file
+                with open("self_improve_simple.py", "w") as file:
+                    file.writelines(data)
+    except Exception as e:
+        print(f"An error occurred while updating the code: {str(e)}")
+
+
+#request gpt and parse for next iter
+
+
 def next_iteration(messages, tokens):
     print(messages)
     time.sleep(25)
@@ -107,6 +161,36 @@ def get_current_code():
         print(
             f"An unknown error has occurred while reading the file: {str(e)}")
         return None
+
+
+def extract_function_definitions(code):
+    """
+    Extracts function definitions from the given code.
+    Returns a list of function definitions as strings.
+    """
+    func_defs = []
+
+    tree = ast.parse(code)
+    for node in ast.walk(tree):
+        if isinstance(node, ast.FunctionDef):
+            func_defs.append(ast.unparse(node))
+
+    return func_defs
+
+
+def extract_function_definitions(code):
+    """
+    Extracts function definitions from the given code.
+    Returns a list of function definitions as strings.
+    """
+    func_defs = []
+
+    tree = ast.parse(code)
+    for node in ast.walk(tree):
+        if isinstance(node, ast.FunctionDef):
+            func_defs.append(ast.unparse(node))
+
+    return func_defs
 
 
 #dont change task
@@ -206,68 +290,3 @@ def parse_AI_response_and_update(response):
         print(f'Found an error: {error_message}')
         print('Falling back to the last backup version.')
         restore_code()
-
-
-import tempfile
-import os
-from pydantic import BaseModel, Field, validator
-import shutil
-import py_compile
-
-
-class CodeModification(BaseModel):
-    action: str = Field(description="Action to perform: add or delete")
-    line_number: int = Field(description="Line number for the action")
-    code: str = Field(description="Code to add", default="")
-
-    @validator("code", always=True)
-    def validate_code_compiles(cls, code, values):
-        action = values.get("action")
-        if action == "add" and code:
-            modifier = CodeModifier('code_file.py')
-            temp_modification = cls(action=action,
-                                    line_number=values.get("line_number"),
-                                    code=code)
-
-            if not modifier.check_code_compiles(temp_modification):
-                error_message = "Code compilation failed after applying the modifications."
-                raise ValueError(error_message)
-        return code
-
-
-class CodeModifier:
-
-    def __init__(self, filepath):
-        self.filepath = filepath
-
-    def apply_modifications(self, filepath, modification):
-        action = modification.action
-        line_number = modification.line_number - 1  # Adjusting for 0-indexing
-        code = modification.code
-        with open(filepath, 'r') as file:
-            lines = file.readlines()
-        if action == 'delete':
-            del lines[line_number]
-        elif action == 'add':
-            code_lines = code.split('\n')
-            for index, code_line in enumerate(code_lines):
-                lines.insert(line_number + index, code_line + '\n')
-        with open(filepath, 'w') as file:
-            file.writelines(lines)
-
-    def check_code_compiles(self, modification):
-        # Create a temporary directory to work in
-        with tempfile.TemporaryDirectory() as temp_dir:
-            # Copy the original file to the temporary directory
-            temp_file_path = os.path.join(temp_dir, "temp_file.py")
-            shutil.copyfile(self.filepath, temp_file_path)
-
-            # Apply the modifications to the temporary file
-            self.apply_modifications(temp_file_path, modification)
-
-            try:
-                # Try compiling the entire temporary file
-                py_compile.compile(temp_file_path, doraise=True)
-                return True
-            except py_compile.PyCompileError:
-                return False

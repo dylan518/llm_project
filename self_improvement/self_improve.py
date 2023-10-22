@@ -255,7 +255,7 @@ def main():
     for i in range(3):  # Run the loop for three iterations
         try:
             target_file = get_target_file()
-            task = get_task() + get_current_code(target_file)
+            task = get_task() + "\n code: \n" + get_current_code(target_file)
             messages[0] = {'role': 'system', 'content': task}
             print(messages)
             messages = shorten_messages(messages)

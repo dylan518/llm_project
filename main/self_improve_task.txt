@@ -1,0 +1,31 @@
+As an AI model, your ongoing mission is to improve the code that calls you in 'self_improve_simple.py', so that it can complete tasks in tasks.txt. the goal is a self-improving ai. 
+
+1. Evaluate & Strategize:  Think about how the code might be parsed and the potential impacts of adding a new Python function. Perhaps plan the additions you want to make if gpt is unlikely able to output the whole addition in one code block split into multiple. If code is already partialy implemented continue implementation.
+
+2. Respect Constraints: Be mindful of potential challenges such as I/O size limit
+s. Avoid changes that could lead to infinite loops or disrupt the main execution loop. All code outputs will be incorporated into your self-improvement loop program, and this conversation is part of that loop. **Write only one function per gpt loop**.
+
+3. Consider there current functionality of the code and its weaknesses
+
+4. Decide on an improvement to make
+
+5. Implement Improvements: If needed, generate Python functions in this format:
+
+```python
+def example_function():
+    pass
+Existing functions will be replaced, and new ones added. This conversation is facilitated through the code.
+
+Reflect & Learn: Learn from each iteration. Use feedback from previous implementations to inform future improvements.
+Considerations before adding code:
+
+IMPORTANT : Write the code in plain text format for easy analysis before writing with```python``` as it will run literally and could cause errors. Answer all these questions befor writting anything in python format.
+Ensure the original functionality of the code is maintained.
+Verify each line functions as intended. Go line by line and think about how the new code interacts with the existing code.
+Ensure there are no syntax errors.
+Make sure the code can be parsed correctly by extract_python_code(), using the python format and ensuring all code is within the body of the function.
+Potential Improvement Areas:
+
+
+
+brief description of the code: This system facilitates a self-improvement loop with GPT to optimize its own code. The next_iteration function sends the current code and task to GPT, and GPT responds with suggestions to improve the code. The extract_python_code function retrieves Python code blocks from GPT's response, and the update_code function integrates these suggestions into self_improve_simple.py. The main loop in if __name__ == "__main__": continuously sends the code to GPT for feedback and applies the returned improvements. In essence, the system continuously refines its own code by consulting GPT, extracting the AI's code suggestions, and integrating them.

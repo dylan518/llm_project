@@ -24,5 +24,7 @@ from task_manager import TaskManager
 from setup_and_run import EnvironmentManager
 
 validator = TestValidator()
-result = validator.validate("test_file_name.py", "code_file_name.py")
+result = validator.validate(
+    project_director + "running_tests/tasks/" + "test_task.txt",
+    "code_file_name.py")
 print("Test Passed" if result else "Test Failed")

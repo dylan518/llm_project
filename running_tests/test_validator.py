@@ -26,6 +26,15 @@ class TestValidator:
         self.env_manager = EnvironmentManager()
         self.TASK_DIR = self.PROJECT_DIRECTORY + "running_tests/tasks"
 
+    def print_file_contents(self, file_path):
+        try:
+            with open(file_path, 'r') as f:
+                print(f"Contents of {file_path}:\n")
+                print(f.read())
+                print("\n" + "=" * 80 + "\n")
+        except Exception as e:
+            print(f"Error reading {file_path}: {e}")
+
     def create_blank_code_file(self, file_name):
         dir_path = os.path.join(self.PROJECT_DIRECTORY, "self_improvement")
         os.makedirs(dir_path, exist_ok=True)
@@ -43,6 +52,8 @@ class TestValidator:
         """
         # Setup environment
         self.env_manager.setup_environment()
+        self.print_file_contents(code_file)
+        self.print_file_contents(test_file)
 
         # Add the directory containing the code_file to the system path
         sys.path.append(os.path.dirname(os.path.abspath(code_file)))

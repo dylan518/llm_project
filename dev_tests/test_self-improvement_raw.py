@@ -25,6 +25,6 @@ from setup_and_run import EnvironmentManager
 
 validator = TestValidator()
 result = validator.validate(
-    project_director + "running_tests/tasks/" + "test_task.txt",
-    "code_file_name.py")
+    project_directory + "running_tests/tasks/" + "test_task.txt",
+    project_directory + "self_improvement" + "code_file_name.py")
 print("Test Passed" if result else "Test Failed")

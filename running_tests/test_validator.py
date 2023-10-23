@@ -3,6 +3,7 @@ import os
 import datetime
 import traceback
 import sys
+import subprocess
 
 project_directory = "/Users/dylanwilson/Documents/GitHub/llm_project/"
 module_directories = [
@@ -55,50 +56,39 @@ class TestValidator:
         self.print_file_contents(code_file)
         self.print_file_contents(test_file)
 
-        # Add the directory containing the code_file to the system path
-        sys.path.append(os.path.dirname(os.path.abspath(code_file)))
+        # Get the absolute path of the test runner script
+        test_runner_script = os.path.join(self.PROJECT_DIRECTORY,
+                                          "enviroment_setup_and_run",
+                                          "test_runner.py")
 
-        # Dynamically import the test module
-        test_module_name = os.path.splitext(test_file)[0]
-        test_module = __import__(f"tests.{test_module_name}",
-                                 fromlist=[test_module_name])
-
-        # Create a test suite from the test module
-        suite = unittest.TestLoader().loadTestsFromModule(test_module)
-
-        # Create a test runner
-        runner = unittest.TextTestRunner()
-
-        # Run the tests
-        result = runner.run(suite)
+        # Run the tests as a separate process
+        result = subprocess.run([
+            sys.executable, test_runner_script, "--test-file", test_file,
+            "--code-file", code_file
+        ],
+                                capture_output=True,
+                                text=True)
 
         # Log the results
         timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
-        log_file_path = os.path.join(self.LOG_DIR,
-                                     f"{test_module_name}_{timestamp}.log")
+        log_file_name = f"test_results_{timestamp}.log"
+        log_file_path = os.path.join(self.LOG_DIR, log_file_name)
 
         with open(log_file_path, 'w') as log_file:
-            log_file.write(
-                f"Ran {result.testsRun} tests for {test_module_name}\n")
-            log_file.write("=" * 40 + "\n")
-            for error in result.errors:
-                log_file.write(f"ERROR: {error[0]}\n")
-                log_file.write(f"{traceback.format_tb(error[1])}\n")
-                log_file.write("=" * 40 + "\n")
-            for failure in result.failures:
-                log_file.write(f"FAILURE: {failure[0]}\n")
-                log_file.write(f"{traceback.format_tb(failure[1])}\n")
-                log_file.write("=" * 40 + "\n")
+            log_file.write(result.stdout)
+            if result.stderr:
+                log_file.write("\n" + "ERRORS:" + "\n" + "=" * 40 + "\n")
+                log_file.write(result.stderr)
 
-        # Return a boolean indicating success or failure
-        return result.wasSuccessful()
+        # Return a boolean indicating success or failure based on the return code
+        return result.returncode == 0
 
     def validate(self, test_file, code_file):
         self.create_blank_code_file(code_file)
         self.update_task(test_file)
         success = self.run_tests(test_file, code_file)
         if not success:
-            backup_path = self.backup_manager.get_last_good_version()
+            self.backup_path = self.backup_manager.get_last_good_version()
             if self.backup_path:
                 self.backup_manager.restore_directory(self.backup_path)
         else:

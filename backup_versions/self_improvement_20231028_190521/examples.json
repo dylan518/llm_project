@@ -1,0 +1,42 @@
+{
+    "examples": [
+        {
+            "input": "Message: Add a function to return the sum of two numbers.\nCode:\n",
+            "output": {
+                "modifications": [
+                    {
+                        "action": "add",
+                        "line_number": 1,
+                        "code": "1: def sum_two_numbers(a, b):\n2:     return a + b"
+                    }
+                ]
+            }
+        },
+        {
+            "input": "Message: Change the function to return the sum of the absolute values of two numbers.\nCode:\n1: def sum_two_numbers(a, b):\n2:     return a + b",
+            "output": {
+                "modifications": [
+                    {
+                        "action": "delete",
+                        "line_number": [
+                            1,
+                            2
+                        ],
+                        "code": ""
+                    },
+                    {
+                        "action": "add",
+                        "line_number": 1,
+                        "code": "1: def sum_absolute(a, b):\n2:     return abs(a) + abs(b)"
+                    }
+                ]
+            }
+        }
+        {
+            "input": "Message: I'm considering making the function return the product instead of the sum.\nCode:\n1: def sum_absolute(a, b):\n2:     return abs(a) + abs(b)",
+            "output": {
+                "modifications": []
+            }
+        }
+    ]
+}

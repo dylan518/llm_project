@@ -24,15 +24,11 @@ def read_file(filepath):
 
 
 def get_task():
-    return read_file(
-        '/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/task.txt'
-    )
+    return read_file('task.txt')
 
 
 def get_target_file():
-    return read_file(
-        '/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/target_file.txt'
-    )
+    return read_file('target_file.txt')
 
 
 #extracts python code from gpt output
@@ -260,7 +256,6 @@ def main():
     for i in range(3):  # Run the loop for three iterations
         try:
             target_file = get_target_file()
-            print(target_file)
             task = get_task() + """
 To add pyhton functions to the codefile generate Python functions in this format:
 

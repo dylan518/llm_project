@@ -101,6 +101,7 @@ class EnvironmentManager:
                                     capture_output=True,
                                     text=True)
             self.outputs[script_name] = result.stdout
+            print(result)
         except subprocess.TimeoutExpired:
             print(f"Terminating {script_name} due to time limit.")
         except Exception as e:

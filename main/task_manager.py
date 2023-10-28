@@ -12,11 +12,13 @@ from setup_and_run import EnvironmentManager
 class TaskManager:
 
     def __init__(self,
-                 task_file_path="self_improvement/task.txt",
-                 target_file_path="self_improvement/self_improve.py"):
+                 task_file_path="/self_improvement/task.txt",
+                 target_file_path="/self_improvement/self_improve.py",
+                 target_text="/self_improvement/target_file.txt"):
         self.project_directory = "/Users/dylanwilson/Documents/GitHub/llm_project"
-        self.task_file_path = task_file_path
-        self.target_file_path = target_file_path
+        self.task_file_path = self.project_directory + task_file_path
+        self.target_file_path = self.project_directory + target_file_path
+        self.target_text = self.project_directory + target_text
 
     def load_task(self):
         """Load the current task from task.txt."""
@@ -34,7 +36,7 @@ class TaskManager:
 
     def set_target_file(self, target):
         """Set the target file in target_file.txt."""
-        with open(self.target_file_path, 'w') as target_file:
+        with open(self.target_text, 'w') as target_file:
             target_file.write(target)
 
     def run_self_improvement_loop(self, time_limit=None, request_limit=None):

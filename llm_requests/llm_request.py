@@ -15,9 +15,9 @@ class LLMRequester:
         try:
             with open(LLMRequester.REQUEST_LIMIT_FILE, 'r') as file:
                 return int(file.read().strip())
-        except:
+        except as e:
             print(
-                "Error reading request limit or no value given. Terminating process."
+                e
             )
             os._exit(1)
 

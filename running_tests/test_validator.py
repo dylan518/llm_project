@@ -26,6 +26,7 @@ class TestValidator:
         self.backup_path = self.backup_manager.BACKUP_DIR
         self.env_manager = EnvironmentManager()
         self.TASK_DIR = self.PROJECT_DIRECTORY + "running_tests/tasks"
+        os.makedirs(self.LOG_DIR, exist_ok=True)
 
     def print_file_contents(self, file_path):
         try:
@@ -84,14 +85,17 @@ class TestValidator:
         return result.returncode == 0
 
     def validate(self, test_file, code_file):
-        self.create_blank_code_file(code_file)
-        self.update_task(test_file)
         success = self.run_tests(test_file, code_file)
-        if not success:
+        return success
+
+
+""" 
+       if not success:
             self.backup_path = self.backup_manager.get_last_good_version()
             if self.backup_path:
-                self.backup_manager.restore_directory(self.backup_path)
+                pass
+#                self.backup_manager.restore_directory()
         else:
             self.backup_manager.backup_directory()
             self.backup_manager.set_last_good_version(self.backup_path)
-        return success
+"""

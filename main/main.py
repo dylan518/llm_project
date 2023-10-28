@@ -25,21 +25,23 @@ class Main:
         self.env_manager = EnvironmentManager()
         self.test_validator = TestValidator()
         self.back_up_dir = self.backup_manager.BACKUP_DIR
-        self.project_directory = "/Users/dylanwilson/Documents/GitHub/llm_project/"
+        self.project_directory = "/Users/dylanwilson/Documents/GitHub/llm_project"
         print(self.back_up_dir)
 
     def run(self):
         # Get the list of all backups sorted by creation time (oldest first)
         self.backup_manager.backup_directory()
         # Run the self-improvement loop
-        self.task_manager.run_self_improvement_loop(time_limit=3600,
-                                                    request_limit=5)
+        #        self.task_manager.run_self_improvement_loop(time_limit=3600,
+        #                                                    request_limit=5)
         #read test instruction to test_task
-        task_file_path = "/running_tests/tasks/test_task0.txt"
+        task_file_path = self.project_directory + "/running_tests/tasks/test_task0.txt"
+        print(task_file_path)
         with open(task_file_path, 'r') as task_file:
             test_task = task_file.read()
 
         self.task_manager.update_task(test_task)
+
         self.task_manager.set_target_file(
             os.path.join(project_directory, "/self_improvement/test_file.py"))
 
@@ -48,7 +50,7 @@ class Main:
                                                     request_limit=3)
         # Test the results
         test_passed = self.test_validator.validate(
-            "unittest0.py",
+            self.project_directory + "/running_test/unittests/unittest0.py",
             os.path.join(project_directory, "/self_improvement/test_file.py"))
 
 

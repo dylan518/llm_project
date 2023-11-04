@@ -42,8 +42,8 @@ class Main:
 
         self.task_manager.update_task(test_task)
 
-        self.task_manager.set_target_file(
-            os.path.join(project_directory, "/self_improvement/test_file.py"))
+        self.task_manager.set_target_file(self.project_directory +
+                                          "/self_improvement/test_file.py")
 
         #have self improvement loop complete test task
         self.task_manager.run_self_improvement_loop(time_limit=3600,

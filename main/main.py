@@ -50,8 +50,8 @@ class Main:
                                                     request_limit=3)
         # Test the results
         test_passed = self.test_validator.validate(
-            self.project_directory + "/running_test/unittests/unittest0.py",
-            os.path.join(project_directory, "/self_improvement/test_file.py"))
+            self.project_directory + "/running_tests/unittests/unittest0.py",
+            self.project_directory + "/self_improvement/test_file.py")
 
 
 if __name__ == "__main__":

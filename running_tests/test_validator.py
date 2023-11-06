@@ -3,6 +3,7 @@ import os
 import datetime
 import traceback
 import sys
+import tempfile
 import subprocess
 
 project_directory = "/Users/dylanwilson/Documents/GitHub/llm_project/"
@@ -56,20 +57,21 @@ class TestValidator:
         self.env_manager.setup_environment()
         self.print_file_contents(code_file)
         self.print_file_contents(test_file)
+        temp_dir = tempfile.mkdtemp()
+        try:
+            # Create a temporary file
+            temp_file_path = os.path.join(temp_dir, 'temp_test_file.py')
+            with open(temp_file_path, 'w') as temp_file:
+                # Write the contents of code_file and test_file to temp_file
+                with open(code_file, 'r') as cf, open(test_file, 'r') as tf:
+                    temp_file.write(cf.read() + '\n' + tf.read())
 
-        # Get the absolute path of the test runner script
-        test_runner_script = os.path.join(self.PROJECT_DIRECTORY,
-                                          "enviroment_setup_and_run",
-                                          "test_runner.py")
-
-        # Run the tests as a separate process
-        result = subprocess.run([
-            sys.executable, test_runner_script, "--test-file", test_file,
-            "--code-file", code_file
-        ],
-                                capture_output=True,
-                                text=True)
-
+            # Run the tests using the temporary file
+            result = subprocess.run([sys.executable, temp_file_path],
+                                    capture_output=True,
+                                    text=True)
+        except:
+            print("error running test script")
         # Log the results
         timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
         log_file_name = f"test_results_{timestamp}.log"

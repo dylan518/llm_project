@@ -1,3 +1,4 @@
+'''
 # logger_config.py
 import logging
 from logging.handlers import RotatingFileHandler
@@ -52,3 +53,4 @@ def get_logger():
 # logger = get_logger()
 # logger.ai_readable('This message is readable by the AI.')
 # logger.info('This is an info message.')
+'''

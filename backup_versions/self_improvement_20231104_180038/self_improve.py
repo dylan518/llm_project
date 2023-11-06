@@ -6,7 +6,7 @@ import ast
 import shutil
 
 project_directory = "/Users/dylanwilson/Documents/GitHub/llm_project/"
-module_directories = ["llm_requests", "running_tests"]
+module_directories = ["llm_requests", "running_tests", "logging"]
 
 for dir in module_directories:
     sys.path.append(os.path.join(project_directory, dir))  # Use os.path.join

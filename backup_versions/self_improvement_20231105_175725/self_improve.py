@@ -6,7 +6,7 @@ import ast
 import shutil
 
 project_directory = "/Users/dylanwilson/Documents/GitHub/llm_project/"
-module_directories = ["llm_requests", "running_tests"]
+module_directories = ["llm_requests", "running_tests", "logging"]
 
 for dir in module_directories:
     sys.path.append(os.path.join(project_directory, dir))  # Use os.path.join
@@ -24,15 +24,11 @@ def read_file(filepath):
 
 
 def get_task():
-    return read_file(
-        '/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/task.txt'
-    )
+    return read_file('task.txt')
 
 
 def get_target_file():
-    return read_file(
-        '/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/target_file.txt'
-    )
+    return read_file('target_file.txt')
 
 
 #extracts python code from gpt output
@@ -69,10 +65,7 @@ def extract_function_definitions(code):
 
 
 #updates code in self_improve_simple.py
-def update_code(
-    func,
-    target_file="/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/self_improve.py"
-):
+def update_code(func, file="self_improve.py"):
     """
     Updates the code in self_improve_simple.py with the new function.
     """
@@ -82,7 +75,7 @@ def update_code(
             if isinstance(node, ast.FunctionDef):
                 func_name = node.name
                 # Open the file and read the current code
-                with open(target_file, "r") as file:
+                with open(file, "r") as file:
                     data = file.readlines()
 
                 # Find the start and end of the existing function definition
@@ -111,10 +104,64 @@ def update_code(
                 data.append('\n' + func + '\n')
 
                 # Write the updated code back to the file
-                with open(target_file, "w") as file:
+                with open("self_improve_simple.py", "w") as file:
                     file.writelines(data)
     except Exception as e:
         print(f"An error occurred while updating the code: {str(e)}")
+
+
+def generate_and_run_tests(function_code):
+    """
+    Generates unit tests for the given function using GPT and runs them.
+    
+    Args:
+    - function_code (str): The code of the function to be tested.
+    
+    Returns:
+    - bool: True if tests pass, False otherwise.
+    - str: Error message if there's an error, otherwise an empty string.
+    """
+
+    # Step 1: Send the function to GPT with a request to generate unit tests
+    prompt = f"Please generate unit tests for the following function:\n{function_code}"
+    messages = [{'role': 'user', 'content': prompt}]
+    requester = LLMRequester()
+    response = requester.request("gpt4", messages, 600)
+    test_code_blocks = extract_python_code(response['content'])
+
+    if not test_code_blocks:
+        return False, "Failed to generate unit tests."
+
+    # Step 2: Extract the unit tests from GPT's response
+    test_code = test_code_blocks[
+        0]  # Assuming the first block contains the tests
+
+    # Step 3: Run the unit tests and return the results
+    # Dynamically create a new test suite with necessary imports
+    test_suite_code = f"""
+import unittest
+{function_code}
+{test_code}
+if __name__ == '__main__':
+    unittest.main()
+"""
+    # Save the test suite to a temporary file
+    with open("temp_test_suite.py", "w") as file:
+        file.write(test_suite_code)
+
+    # Run the test suite
+    result = subprocess.run(["python", "temp_test_suite.py"],
+                            capture_output=True,
+                            text=True)
+
+    # Clean up the temporary file
+    os.remove("temp_test_suite.py")
+
+    # Check the results
+    if result.returncode == 0:
+        return True, ""
+    else:
+        return False, result.stderr
 
 
 #shortens messages to long for gpt
@@ -129,9 +176,7 @@ def shorten_messages(messages, max_chars=50000):
     return messages
 
 
-def get_current_code(
-    filepath='/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/self_improve.py'
-):
+def get_current_code(filepath='self_improve.py'):
     try:
         with open(filepath, "r") as file:
             code = file.read()
@@ -149,7 +194,7 @@ def backup_code():
     Arguments:
     filepath -- str: a string that contains the name of the file we want to backup.
     """
-    filepath = '/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/self_improve.py'
+    filepath = 'self_improve.py'
     backup_path = filepath + '_backup'
     shutil.copy2(filepath, backup_path)
     print(f'Backup of {filepath} created at {backup_path}')
@@ -159,7 +204,7 @@ def restore_code():
     """
     Restores the code from the backup file.
     """
-    filepath = '/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/self_improve.py'
+    filepath = 'self_improve.py'
     if os.path.isfile(filepath):
         os.remove(filepath)
     backup_path = filepath + '_backup'
@@ -167,18 +212,13 @@ def restore_code():
     print(f'Restored the backed up file to {filepath}.')
 
 
-def parse_AI_response_and_update(
-    response,
-    file="/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/self_improve.py"
-):
+def parse_AI_response_and_update(response, file="self_improve.py"):
     """
     Parses the AI response and updates self_improve.py.
     """
     try:
         backup_code()
         code_blocks = extract_python_code(response)
-        print("code blocks:\n")
-        print(code_blocks)
         if not code_blocks:
             return None
         for code in code_blocks:
@@ -194,9 +234,7 @@ def parse_AI_response_and_update(
                 update_code(func_def, file)
             if error_message:
                 raise SyntaxError(error_message)
-        os.remove(
-            '/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/self_improve.py_backup'
-        )
+        os.remove('self_improve.py_backup')
     except Exception as e:
         error_message = str(e)
         print(f'Found an error: {error_message}')
@@ -204,11 +242,7 @@ def parse_AI_response_and_update(
         restore_code()
 
 
-def next_iteration(
-    messages,
-    tokens,
-    file="/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/self_improve.py"
-):
+def next_iteration(messages, tokens, file="self_improve.py"):
     print(messages)
     requester = LLMRequester()
     response = requester.request("gpt4", messages, 600)
@@ -222,16 +256,14 @@ def main():
     for i in range(3):  # Run the loop for three iterations
         try:
             target_file = get_target_file()
-            print(target_file)
             task = get_task() + """
 To add pyhton functions to the codefile generate Python functions in this format:
 
 ```python
 def example_function():
     pass
-``
-esnsure def is directly after python. there should be nothing before or after the function. All imports will automatically be handle don't add imports
-Existing functions will be replaced, and new ones added. This is the code of the target file.""" + "\n code: \n" + get_current_code(
+```
+Existing functions will be replaced, and new ones added. This conversation is facilitated through the code.""" + "\n code: \n" + get_current_code(
                 target_file)
             messages[0] = {'role': 'system', 'content': task}
             print(messages)

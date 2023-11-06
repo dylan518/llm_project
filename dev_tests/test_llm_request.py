@@ -4,11 +4,12 @@ import os
 import json  # Imported json as it is used in test_save_interactions
 from unittest.mock import patch, Mock, mock_open, ANY
 
-project_directory = "/Users/dylanwilson/Documents/GitHub/llm_project/"
-module_directories = ["llm_requests", "running_tests", "logging"]
+PROJECT_DIRECTORY = "/Users/dylanwilson/Documents/GitHub/llm_project/"
+MODULE_DIRECTORIES = ["llm_requests", "running_tests", "logging"]
 
-for dir in module_directories:
-    sys.path.append(os.path.join(project_directory, dir))  # Use os.path.join
+for directory in MODULE_DIRECTORIES:
+    sys.path.append(os.path.join(PROJECT_DIRECTORY,
+                                 directory))  # Use os.path.join
 
 from llm_request import LLMRequester
 
@@ -17,6 +18,7 @@ class TestLLMRequester(unittest.TestCase):
 
     def setUp(self):
         self.requester = LLMRequester()
+        self.PROJECT_DIRECTORY = "/Users/dylanwilson/Documents/GitHub/llm_project/"
 
     def test_request_gpt3(self):
         with patch('llm_request.LLMRequester.read_request_limit',
@@ -59,7 +61,8 @@ class TestLLMRequester(unittest.TestCase):
             with patch('builtins.open',
                        mock_open()) as mock_file:  # Corrected mock_open
                 self.requester.decrement_request_limit()
-                mock_file.assert_called_with(self.requester.REQUEST_LIMIT_FILE,
+                mock_file.assert_called_with(self.PROJECT_DIRECTORY +
+                                             self.requester.REQUEST_LIMIT_FILE,
                                              'w')  # Accessed through instance
                 mock_file().write.assert_called_with("9")
 

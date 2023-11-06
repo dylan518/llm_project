@@ -5,11 +5,12 @@ import re
 import ast
 import shutil
 
-project_directory = "/Users/dylanwilson/Documents/GitHub/llm_project/"
-module_directories = ["llm_requests", "running_tests"]
+PROJECT_DIRECTORY = "/Users/dylanwilson/Documents/GitHub/llm_project/"
+MODULE_DIRECTORIES = ["llm_requests", "running_tests"]
 
-for dir in module_directories:
-    sys.path.append(os.path.join(project_directory, dir))  # Use os.path.join
+for directory in MODULE_DIRECTORIES:
+    sys.path.append(os.path.join(PROJECT_DIRECTORY,
+                                 directory))  # Use os.path.join
 
 from llm_request import LLMRequester
 

@@ -8,14 +8,14 @@ import os
 import sys
 import shutil  # Import shutil for rmtree
 
-project_directory = "/Users/dylanwilson/Documents/GitHub/llm_project/"
+PROJECT_DIRECTORY = "/Users/dylanwilson/Documents/GitHub/llm_project/"
 
-module_directories = [
+MODULE_DIRECTORIES = [
     "main", "llm_requests", "enviroment_setup_and_run", "running_tests",
     "logging"
 ]
-for dir in module_directories:
-    sys.path.append(project_directory + dir)
+for directory in MODULE_DIRECTORIES:
+    sys.path.append(PROJECT_DIRECTORY + directory)
 from test_validator import TestValidator
 from manage_backups import BackupManager
 from main import Main
@@ -23,6 +23,5 @@ from llm_request import LLMRequester
 from task_manager import TaskManager
 from setup_and_run import EnvironmentManager
 
-validator = TestValidator()
 main = Main()
 main.run()

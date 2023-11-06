@@ -3,19 +3,19 @@ import sys
 import unittest
 from unittest.mock import patch, mock_open
 
-project_directory = "/Users/dylanwilson/Documents/GitHub/llm_project/"
-module_directories = [
+PROJECT_DIRECTORY = "/Users/dylanwilson/Documents/GitHub/llm_project/"
+MODULE_DIRECTORIES = [
     "main", "llm_requests", "enviroment_setup_and_run", "running_tests",
     "logging"
 ]
 
-for dir in module_directories:
-    sys.path.append(os.path.join(project_directory, dir))
+for directory in MODULE_DIRECTORIES:
+    sys.path.append(os.path.join(PROJECT_DIRECTORY, directory))
 
 from task_manager import TaskManager
 from setup_and_run import EnvironmentManager
 
-#os.chdir(project_directory)
+#os.chdir(PROJECT_DIRECTORY)
 
 
 class TestTaskManager(unittest.TestCase):

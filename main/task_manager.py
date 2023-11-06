@@ -1,11 +1,11 @@
 import sys
 import os
 
-project_directory = "/Users/dylanwilson/Documents/GitHub/llm_project"
+PROJECT_DIRECTORY = "/Users/dylanwilson/Documents/GitHub/llm_project"
 
-module_directories = ["enviroment_setup_and_run"]
-for dir in module_directories:
-    sys.path.append(project_directory + dir)
+MODULE_DIRECTORIES = ["enviroment_setup_and_run"]
+for directory in MODULE_DIRECTORIES:
+    sys.path.append(PROJECT_DIRECTORY + directory)
 from setup_and_run import EnvironmentManager
 
 
@@ -15,10 +15,10 @@ class TaskManager:
                  task_file_path="/self_improvement/task.txt",
                  target_file_path="/self_improvement/self_improve.py",
                  target_text="/self_improvement/target_file.txt"):
-        self.project_directory = "/Users/dylanwilson/Documents/GitHub/llm_project"
-        self.task_file_path = self.project_directory + task_file_path
-        self.target_file_path = self.project_directory + target_file_path
-        self.target_text = self.project_directory + target_text
+        self.PROJECT_DIRECTORY = "/Users/dylanwilson/Documents/GitHub/llm_project"
+        self.task_file_path = self.PROJECT_DIRECTORY + task_file_path
+        self.target_file_path = self.PROJECT_DIRECTORY + target_file_path
+        self.target_text = self.PROJECT_DIRECTORY + target_text
 
     def load_task(self):
         """Load the current task from task.txt."""

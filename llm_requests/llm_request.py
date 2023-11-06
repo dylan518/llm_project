@@ -61,6 +61,34 @@ class LLMRequester:
             print(f"Error initializing LLMs: {str(e)}")
             raise
 
+    def parse_to_messages(self, prompt):
+        # If it's a string, just return it
+        if isinstance(prompt, str):
+            return prompt
+
+        # If it's a list, check if it's a list of strings or a list of dicts
+        elif isinstance(prompt, list):
+            if all(isinstance(item, str) for item in prompt):
+                # It's a list of strings, join them
+                combined_content = ' '.join(prompt)
+                return combined_content
+            elif all(
+                    isinstance(item, dict) and 'content' in item
+                    for item in prompt):
+                # It's a list of dicts, combine the 'content' field
+                combined_content = ' '.join(msg['content'] for msg in prompt)
+                return combined_content
+            else:
+                raise ValueError(
+                    "List items must be either all strings or all dicts with a 'content' key."
+                )
+
+        # If it's neither a string nor a list, raise an error
+        else:
+            raise ValueError(
+                "Prompt must be a string, a list of strings, or a list of dicts with a 'content' key."
+            )
+
     def request(self, model, prompt, retries=3, delay=10):
         for _ in range(retries):
             if self.read_request_limit() <= 0:
@@ -68,21 +96,16 @@ class LLMRequester:
                 os._exit(1)
             self.decrement_request_limit()
             try:
-                print(prompt)
-                print(prompt[0]['content'])
-                combined_content = ' '.join(msg['content'] for msg in prompt
-                                            if isinstance(msg['content'], str))
-                print("combined_content:" + "\n" + combined_content)
-                human_messages = HumanMessage(content=combined_content)
+                combined_content = self.parse_to_messages(prompt)
+                if not isinstance(combined_content, str):
+                    raise TypeError("Parsed content must be a string.")
             except Exception as e:
-                print("error parsing to human message:")
+                print("error parsing to string:")
                 print(e)
             try:
                 if model == "gpt3":
                     response = self.llm_gpt3.predict(combined_content)
                 elif model == "gpt4":
-                    print(type(prompt))
-                    print(human_messages)
                     response = self.llm_gpt4.predict(combined_content)
                 else:
                     raise ValueError("Invalid model specified.")

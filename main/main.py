@@ -3,11 +3,12 @@ import unittest
 import sys
 import shutil  # Import shutil for rmtree
 
-project_directory = "/Users/dylanwilson/Documents/GitHub/llm_project/"
-module_directories = ["enviroment_setup_and_run", "running_tests", "logging"]
+PROJECT_DIRECTORY = "/Users/dylanwilson/Documents/GitHub/llm_project/"
+MODULE_DIRECTORIES = ["enviroment_setup_and_run", "running_tests", "logging"]
 
-for dir in module_directories:
-    sys.path.append(os.path.join(project_directory, dir))  # Use os.path.join
+for directory in MODULE_DIRECTORIES:
+    sys.path.append(os.path.join(PROJECT_DIRECTORY,
+                                 directory))  # Use os.path.join
 
 from manage_backups import BackupManager
 from test_validator import TestValidator
@@ -25,7 +26,7 @@ class Main:
         self.env_manager = EnvironmentManager()
         self.test_validator = TestValidator()
         self.back_up_dir = self.backup_manager.BACKUP_DIR
-        self.project_directory = "/Users/dylanwilson/Documents/GitHub/llm_project"
+        self.PROJECT_DIRECTORY = "/Users/dylanwilson/Documents/GitHub/llm_project"
         print(self.back_up_dir)
 
     def run(self):
@@ -35,14 +36,14 @@ class Main:
         #        self.task_manager.run_self_improvement_loop(time_limit=3600,
         #                                                    request_limit=5)
         #read test instruction to test_task
-        task_file_path = self.project_directory + "/running_tests/tasks/test_task0.txt"
+        task_file_path = self.PROJECT_DIRECTORY + "/running_tests/tasks/test_task0.txt"
         print(task_file_path)
         with open(task_file_path, 'r') as task_file:
             test_task = task_file.read()
 
         self.task_manager.update_task(test_task)
 
-        self.task_manager.set_target_file(self.project_directory +
+        self.task_manager.set_target_file(self.PROJECT_DIRECTORY +
                                           "/self_improvement/test_file.py")
 
         #have self improvement loop complete test task
@@ -50,8 +51,8 @@ class Main:
                                                     request_limit=3)
         # Test the results
         test_passed = self.test_validator.validate(
-            self.project_directory + "/running_tests/unittests/unittest0.py",
-            self.project_directory + "/self_improvement/test_file.py")
+            self.PROJECT_DIRECTORY + "/running_tests/unittests/unittest0.py",
+            self.PROJECT_DIRECTORY + "/self_improvement/test_file.py")
 
 
 if __name__ == "__main__":

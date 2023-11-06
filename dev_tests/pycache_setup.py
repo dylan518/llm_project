@@ -1,8 +1,9 @@
-import os
-import sys
+"""adds pycache files to project so all modules can be accessed as packages"""
 
-project_directory = "/Users/dylanwilson/Documents/GitHub/llm_project/"
-module_directories = [
+import os
+
+PROJECT_DIRECTORY = "/Users/dylanwilson/Documents/GitHub/llm_project/"
+MODULE_DIRECTORIES = [
     "main", "llm_requests", "enviroment_setup_and_run", "running_tests",
     "logging", "self_improvement"
 ]
@@ -20,15 +21,12 @@ def add_init_files(root_directory, module_dirs):
             # Create __init__.py if it doesn't exist
             if not os.path.exists(init_file):
                 with open(init_file, 'w') as f:
-                    # Create an empty __init__.py file
-                    pass
+                    pass  # Create an empty __init__.py file
                 print(f"Added __init__.py in {target_dir}")
         else:
             print(f"Directory not found: {target_dir}")
 
 
-add_init_files(project_directory, module_directories)
-
-# Provide the path to your project's root directory
-project_root = "/Users/dylanwilson/Documents/GitHub/llm_project/"
-add_init_files(project_root)
+if __name__ == "__main__":
+    # Provide the path to your project's root directory
+    add_init_files(PROJECT_DIRECTORY, MODULE_DIRECTORIES)

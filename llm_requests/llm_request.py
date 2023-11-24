@@ -53,7 +53,7 @@ class LLMRequester:
             self.llm_gpt4 = ChatOpenAI(  # Use ChatOpenAI class for llm_gpt4 if gpt-4 supports ChatModels
                 openai_api_key=os.environ.get('OPENAI_API_KEY'),
                 temperature=0,
-                model_name='gpt-4')
+                model_name='gpt-4-1106-preview')
 
 
 #            print(dir(self.llm_gpt4))

@@ -1,0 +1,16 @@
+
+ERRORS:
+========================================
+E
+======================================================================
+ERROR: test_palindrome (__main__.PalindromeTester)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/folders/r_/0pzlm9c91ln8y8wlzmj2q14m0000gn/T/tmp9a5ip0eq/temp_test_file.py", line 22, in setUp
+    from path_to_test_file import is_palindrome
+ModuleNotFoundError: No module named 'path_to_test_file'
+
+----------------------------------------------------------------------
+Ran 1 test in 0.001s
+
+FAILED (errors=1)

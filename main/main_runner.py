@@ -25,8 +25,6 @@ class Main:
         self.task_manager = TaskManager()
         self.env_manager = EnvironmentManager()
         self.test_validator = TestValidator()
-        print("TestValidator initialized:",
-              isinstance(self.test_validator, TestValidator))
         self.back_up_dir = self.backup_manager.BACKUP_DIR
         self.PROJECT_DIRECTORY = "/Users/dylanwilson/Documents/GitHub/llm_project"
         print(self.back_up_dir)

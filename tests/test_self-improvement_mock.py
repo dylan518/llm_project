@@ -4,9 +4,7 @@ import os
 import sys
 
 PROJECT_DIRECTORY = "/Users/dylanwilson/Documents/GitHub/llm_project/"
-MODULE_DIRECTORIES = [
-    "enviroment_setup_and_run", "running_tests", "logging", "self_improvement"
-]
+MODULE_DIRECTORIES = ["self_improvement"]
 
 for directory in MODULE_DIRECTORIES:
     sys.path.append(os.path.join(PROJECT_DIRECTORY,
@@ -14,7 +12,6 @@ for directory in MODULE_DIRECTORIES:
 
 from self_improve import (
     update_code,
-    shorten_messages,
     get_current_code,
     backup_code,
     restore_code,
@@ -34,11 +31,6 @@ class TestSelfImprovement(unittest.TestCase):
         update_code(func, target_file)
         mock_open.assert_called()
         mock_ast_parse.assert_called()
-
-    def test_shorten_messages(self):
-        messages = [{'role': 'user', 'content': 'hello'}] * 10000
-        shortened = shorten_messages(messages)
-        self.assertTrue(len(str(shortened)) < 50000)
 
     @mock.patch('builtins.open',
                 new_callable=mock.mock_open,

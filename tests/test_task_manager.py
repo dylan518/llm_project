@@ -48,12 +48,11 @@ class TestTaskManager(unittest.TestCase):
                              "Failed to get current task.")
 
     def test_set_target_file(self):
-        """Test the set_target_file method."""
         target = "target.py"
+        expected_file_path = '/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/target_file.txt'
         with patch("builtins.open", mock_open()) as mock_file:
             self.manager.set_target_file(target)
-            mock_file.assert_called_once_with(self.manager.target_file_path,
-                                              'w')
+            mock_file.assert_called_once_with(expected_file_path, 'w')
             mock_file().write.assert_called_once_with(target)
 
     def test_run_self_improvement_loop(self):

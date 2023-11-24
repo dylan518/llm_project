@@ -4,6 +4,11 @@
 
 
 
+
+
+
+
+
 def is_palindrome(s: str) -> bool:
-    s = ''.join((c for c in s if c.isalnum())).lower()
-    return s == s[::-1]
+    cleaned_s = ''.join((char.lower() for char in s if char.isalnum()))
+    return cleaned_s == cleaned_s[::-1]

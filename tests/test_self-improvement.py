@@ -18,8 +18,7 @@ for directory in MODULE_DIRECTORIES:
 from self_improve import (read_file, get_task, get_target_file,
                           extract_python_code, extract_function_definitions,
                           update_code, backup_code, restore_code,
-                          parse_AI_response_and_update,
-                          shorten_messages)  #pylint
+                          parse_AI_response_and_update)  #pylint
 
 
 class TestSelfImprover(unittest.TestCase):
@@ -39,7 +38,9 @@ class TestSelfImprover(unittest.TestCase):
         with mock.patch('self_improve.read_file',
                         return_value='Test task') as mocked_read_file:
             self.assertEqual(get_task(), 'Test task')
-            mocked_read_file.assert_called_with('task.txt')
+            mocked_read_file.assert_called_with(
+                '/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/task.txt'
+            )
 
     def test_get_target_file(self):
         # Mocking the read_file function to return a specific string

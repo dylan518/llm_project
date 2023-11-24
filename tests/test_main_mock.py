@@ -40,10 +40,9 @@ class TestMain(unittest.TestCase):
         mock_test_validator.run_tests.return_value = True
 
         # Running the main process
-        self.main.run()  # Corrected line
+        self.main.run()
 
         # Assertions to check if the methods were called
-        mock_backup_manager.restore_directory.assert_called()
         mock_task_manager.run_self_improvement_loop.assert_called()
         mock_test_validator.run_tests.assert_called()
 

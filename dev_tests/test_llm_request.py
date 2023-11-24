@@ -18,7 +18,7 @@ class TestLLMRequester(unittest.TestCase):
 
     def setUp(self):
         self.requester = LLMRequester()
-        self.PROJECT_DIRECTORY = "/Users/dylanwilson/Documents/GitHub/llm_project/"
+        self.PROJECT_DIRECTORY = "/Users/dylanwilson/Documents/GitHub/llm_project"
 
     def test_request_gpt3(self):
         with patch('llm_request.LLMRequester.read_request_limit',
@@ -58,12 +58,13 @@ class TestLLMRequester(unittest.TestCase):
     def test_decrement_request_limit(self):
         with patch('llm_request.LLMRequester.read_request_limit',
                    return_value=10):
-            with patch('builtins.open',
-                       mock_open()) as mock_file:  # Corrected mock_open
+            with patch('builtins.open', mock_open()) as mock_file:
                 self.requester.decrement_request_limit()
-                mock_file.assert_called_with(self.PROJECT_DIRECTORY +
-                                             self.requester.REQUEST_LIMIT_FILE,
-                                             'w')  # Accessed through instance
+                # Make sure to construct the path as it is in the LLMRequester class
+                expected_file_path = os.path.join(
+                    self.PROJECT_DIRECTORY, "llm_requests",
+                    self.requester.REQUEST_LIMIT_FILE)
+                mock_file.assert_called_with(expected_file_path, 'w')
                 mock_file().write.assert_called_with("9")
 
     def test_save_interactions(self):

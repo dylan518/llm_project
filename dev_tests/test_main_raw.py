@@ -11,7 +11,7 @@ MODULE_DIRECTORIES = [
 for directory in MODULE_DIRECTORIES:
     sys.path.append(PROJECT_DIRECTORY + directory)
 
-from main import Main
+from main_runner import Main
 
 main = Main()
 main.run()

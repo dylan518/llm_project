@@ -88,16 +88,11 @@ class TestValidator:
 
     def validate(self, test_file, code_file):
         success = self.run_tests(test_file, code_file)
-        return success
-
-
-""" 
-       if not success:
+        if not success:
             self.backup_path = self.backup_manager.get_last_good_version()
             if self.backup_path:
-                pass
-#                self.backup_manager.restore_directory()
+                self.backup_manager.restore_directory()
         else:
             self.backup_manager.backup_directory()
             self.backup_manager.set_last_good_version(self.backup_path)
-"""
+            return success

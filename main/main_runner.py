@@ -25,6 +25,8 @@ class Main:
         self.task_manager = TaskManager()
         self.env_manager = EnvironmentManager()
         self.test_validator = TestValidator()
+        print("TestValidator initialized:",
+              isinstance(self.test_validator, TestValidator))
         self.back_up_dir = self.backup_manager.BACKUP_DIR
         self.PROJECT_DIRECTORY = "/Users/dylanwilson/Documents/GitHub/llm_project"
         print(self.back_up_dir)
@@ -32,9 +34,11 @@ class Main:
     def run(self):
         # Get the list of all backups sorted by creation time (oldest first)
         self.backup_manager.backup_directory()
+        #set self_improve.txt to task.txt
+        #set traget file as project direct /self_improvement/self_improve.py
         # Run the self-improvement loop
         #        self.task_manager.run_self_improvement_loop(time_limit=3600,
-        #                                                    request_limit=5)
+        #                                                    request_limit=20)
         #read test instruction to test_task
         task_file_path = self.PROJECT_DIRECTORY + "/running_tests/tasks/test_task0.txt"
         print(task_file_path)

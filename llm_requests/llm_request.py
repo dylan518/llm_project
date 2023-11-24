@@ -17,7 +17,7 @@ class LLMRequester:
     def read_request_limit():
         try:
             with open(
-                    os.path.join(LLMRequester.PROJECT_PATH + "/llm_requests",
+                    os.path.join(LLMRequester.PROJECT_PATH + "llm_requests",
                                  LLMRequester.REQUEST_LIMIT_FILE),
                     'r') as file:
                 return int(file.read().strip())
@@ -30,7 +30,7 @@ class LLMRequester:
         try:
             current_limit = LLMRequester.read_request_limit()
             with open(
-                    os.path.join(LLMRequester.PROJECT_PATH + "/llm_requests",
+                    os.path.join(LLMRequester.PROJECT_PATH + "llm_requests",
                                  LLMRequester.REQUEST_LIMIT_FILE),
                     'w') as file:
                 file.write(str(current_limit - 1))

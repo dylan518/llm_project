@@ -1,6 +1,9 @@
 """
 test for self improvement
 """
+import sys
+import os
+import unittest
 from unittest import mock
 from self_improve import (read_file, get_task, get_target_file,
                           extract_python_code, extract_function_definitions,

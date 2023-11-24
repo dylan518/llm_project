@@ -1,7 +1,0 @@
-
-ERRORS:
-========================================
-Traceback (most recent call last):
-  File "/var/folders/r_/0pzlm9c91ln8y8wlzmj2q14m0000gn/T/tmpaju_tepn/temp_test_file.py", line 8, in <module>
-    class PalindromeTester(unittest.TestCase):
-NameError: name 'unittest' is not defined

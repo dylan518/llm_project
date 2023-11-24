@@ -1,5 +1,17 @@
 import unittest
 from unittest import mock
+import os
+import sys
+
+PROJECT_DIRECTORY = "/Users/dylanwilson/Documents/GitHub/llm_project/"
+MODULE_DIRECTORIES = [
+    "enviroment_setup_and_run", "running_tests", "logging", "self_improvement"
+]
+
+for directory in MODULE_DIRECTORIES:
+    sys.path.append(os.path.join(PROJECT_DIRECTORY,
+                                 directory))  # Use os.path.join
+
 from self_improve import (
     update_code,
     shorten_messages,
@@ -96,4 +108,3 @@ class TestSelfImprovement(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-

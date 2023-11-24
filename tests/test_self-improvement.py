@@ -5,11 +5,6 @@ import sys
 import os
 import unittest
 from unittest import mock
-from self_improve import (read_file, get_task, get_target_file,
-                          extract_python_code, extract_function_definitions,
-                          update_code, backup_code, restore_code,
-                          parse_AI_response_and_update,
-                          shorten_messages)  #pylint
 
 PROJECT_DIRECTORY = "/Users/dylanwilson/Documents/GitHub/llm_project/"
 MODULE_DIRECTORIES = [
@@ -19,6 +14,12 @@ MODULE_DIRECTORIES = [
 for directory in MODULE_DIRECTORIES:
     sys.path.append(os.path.join(PROJECT_DIRECTORY,
                                  directory))  # Use os.path.join
+
+from self_improve import (read_file, get_task, get_target_file,
+                          extract_python_code, extract_function_definitions,
+                          update_code, backup_code, restore_code,
+                          parse_AI_response_and_update,
+                          shorten_messages)  #pylint
 
 
 class TestSelfImprover(unittest.TestCase):

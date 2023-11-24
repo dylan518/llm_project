@@ -28,9 +28,16 @@ class BackupManager:
         return backup_path
 
     def restore_directory(self):
+        backup_to_restore = self.get_most_recent_version(
+        )  # or get_last_good_version
+        if not backup_to_restore:
+            print("No backup available to restore.")
+            return
+
         if os.path.exists(self.TARGET_DIR):
             shutil.rmtree(self.TARGET_DIR)
-        shutil.copytree(self.BACKUP_DIR, self.TARGET_DIR)
+
+        shutil.copytree(backup_to_restore, self.TARGET_DIR)
 
     def get_last_good_version(self):
         if os.path.exists(self.LAST_GOOD_VERSION):

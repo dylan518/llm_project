@@ -232,12 +232,3 @@ Existing functions will be replaced, and new ones added. This is the code of the
 
 
 main()
-
-
-
-def check_syntax(code):
-    try:
-        compile(code, '<string>', 'exec')
-        return True
-    except SyntaxError:
-        return False

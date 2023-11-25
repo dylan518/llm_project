@@ -118,18 +118,6 @@ def update_code(
         print(f"An error occurred while updating the code: {str(e)}")
 
 
-#shortens messages to long for gpt
-def shorten_messages(messages, max_chars=50000):
-    """
-    Shortens the list of messages to fit within the specified character limit.
-    """
-    message_str = str(messages)
-    while (len(message_str) >= max_chars):
-        del messages[1]
-        print("deletion")
-    return messages
-
-
 def get_current_code(
     filepath='/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/self_improve.py'
 ):
@@ -236,7 +224,6 @@ Existing functions will be replaced, and new ones added. This is the code of the
                 target_file)
             messages[0] = {'role': 'system', 'content': task}
             print(messages)
-            messages = shorten_messages(messages)
             messages.append(next_iteration(messages, 600, target_file))
             print(messages)
         except Exception as e:
@@ -245,3 +232,12 @@ Existing functions will be replaced, and new ones added. This is the code of the
 
 
 main()
+
+
+
+def check_syntax(code):
+    try:
+        compile(code, '<string>', 'exec')
+        return True
+    except SyntaxError:
+        return False

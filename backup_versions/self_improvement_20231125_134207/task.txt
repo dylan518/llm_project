@@ -24,9 +24,7 @@ Ensure the original functionality of the code is maintained.
 Verify each line functions as intended. Go line by line and think about how the new code interacts with the existing code.
 Ensure there are no syntax errors.
 Make sure the code can be parsed correctly by extract_python_code(), using the python format and ensuring all code is within the body of the function.
-For now make the following improvements:
-
-Ensure the file compiles after a change is added. If it doesn't restore the file.
+Potential Improvement Areas:
 
 
 

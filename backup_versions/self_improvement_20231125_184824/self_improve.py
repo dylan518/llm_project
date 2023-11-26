@@ -14,15 +14,6 @@ for directory in MODULE_DIRECTORIES:
 
 from llm_request import LLMRequester
 
-def log_iteration_activity(messages, message_content):
-    import datetime
-    timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    log_entry = f'{timestamp} - {message_content}\n'
-    log_file_path = '/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/iteration_log.log'
-    with open(log_file_path, 'a') as log_file:
-        log_file.write(log_entry)
-    messages.append({'role': 'log', 'content': log_entry.strip()})
-
 
 def log_new_messages(messages, log_file_path, last_read_position_file):
     try:
@@ -215,16 +206,12 @@ def parse_AI_response_and_update(response, file):
 
 
 def next_iteration(messages, tokens, file):
-    log_iteration_activity(messages, 'Starting new iteration.')
     requester = LLMRequester()
-    response = requester.request('gpt4', messages)
-    log_iteration_activity(messages, f'AI response: {response}')
-    parsed_response = parse_AI_response_and_update(response, file)
-    if parsed_response is None:
-        log_iteration_activity(messages, 'No code blocks found in AI response.')
-    else:
-        log_iteration_activity(messages, 'Code blocks parsed and updated.')
-    return {'role': 'assistant', 'content': response}
+    response = requester.request("gpt4", messages)
+    print(parse_AI_response_and_update(response, file))
+    return ({'role': 'assistant', 'content': response})
+
+
 def main():
     print("self_improvement loop started!")
     messages = ["temp"]

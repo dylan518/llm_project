@@ -30,8 +30,6 @@ class Main:
         print(self.back_up_dir)
 
     def run(self):
-        # back up /self_improvement directory
-        self.backup_manager.backup_directory()
         #set self_improve_task.txt to task.txt
         task_file_path = self.PROJECT_DIRECTORY + "/main/self_improve_task.txt"
         print(task_file_path)
@@ -47,6 +45,28 @@ class Main:
         self.task_manager.run_self_improvement_loop(time_limit=3600,
                                                     request_limit=20)
         #read test instruction to test_task
+        task_file_path = self.PROJECT_DIRECTORY + "/running_tests/tasks/test_task0.txt"
+        print(task_file_path)
+        with open(task_file_path, 'r') as task_file:
+            test_task = task_file.read()
+
+        self.task_manager.update_task(test_task)
+
+        test_file_path = os.path.join(self.PROJECT_DIRECTORY,
+                                      "self_improvement", "test_file.py")
+        with open(test_file_path, 'w') as test_file:
+            pass
+        self.task_manager.set_target_file(test_file_path)
+
+        #have self improvement loop complete test task
+        self.task_manager.run_self_improvement_loop(time_limit=3600,
+                                                    request_limit=3)
+        # Test the results
+        test_passed = self.test_validator.validate(
+            self.PROJECT_DIRECTORY + "/running_tests/unittests/unittest0.py",
+            self.PROJECT_DIRECTORY + "/self_improvement/test_file.py")
+
+    def only_test(self):
         task_file_path = self.PROJECT_DIRECTORY + "/running_tests/tasks/test_task0.txt"
         print(task_file_path)
         with open(task_file_path, 'r') as task_file:

@@ -90,7 +90,7 @@ class LLMRequester:
             )
 
     def request(self, model, prompt, retries=3, delay=10):
-        time.sleep(1)
+        time.sleep(5)
         for _ in range(retries):
             if self.read_request_limit() <= 0:
                 print("Request limit reached. Terminating process.")
@@ -100,6 +100,7 @@ class LLMRequester:
                 combined_content = self.parse_to_messages(prompt)
                 if not isinstance(combined_content, str):
                     raise TypeError("Parsed content must be a string.")
+                print(combined_content)
             except Exception as e:
                 print("error parsing to string:")
                 print(e)

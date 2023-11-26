@@ -14,38 +14,6 @@ for directory in MODULE_DIRECTORIES:
 
 from llm_request import LLMRequester
 
-def log_iteration_activity(messages, message_content):
-    import datetime
-    timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    log_entry = f'{timestamp} - {message_content}\n'
-    log_file_path = '/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/iteration_log.log'
-    with open(log_file_path, 'a') as log_file:
-        log_file.write(log_entry)
-    messages.append({'role': 'log', 'content': log_entry.strip()})
-
-
-def log_new_messages(messages, log_file_path, last_read_position_file):
-    try:
-        with open(last_read_position_file, 'r') as file:
-            last_read_position = int(file.read().strip())
-    except (FileNotFoundError, ValueError):
-        last_read_position = 0
-    new_messages = []
-    with open(log_file_path, 'r') as file:
-        file.seek(last_read_position)
-        new_messages = file.readlines()
-        last_read_position = file.tell()
-    for message in new_messages:
-        messages.append({'role': 'log', 'content': message.strip()})
-    with open(last_read_position_file, 'w') as file:
-        file.write(str(last_read_position))
-
-
-def append_new_log_messages(messages):
-    log_file_path = '/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/log_file.log'
-    last_read_position_file = '/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/last_read_position.txt'
-    log_new_messages(messages, log_file_path, last_read_position_file)
-
 
 def read_file(filepath):
     try:
@@ -104,44 +72,47 @@ def extract_function_definitions(code):
 #updates code in self_improve.py
 def update_code(func, target_file):
     """
-    Updates the code in self_improve.py with the new function.
-    Inserts the new function at the beginning of the file, after any import statements,
-    or replaces an existing function with the same name.
+    Updates the code in the target file with the new function.
+    If the function already exists, it replaces it; otherwise, it appends the new function.
     """
     try:
+        # Parse the new function to get its name
         tree = ast.parse(func)
-        for node in tree.body:
-            if isinstance(node, ast.FunctionDef):
-                func_name = node.name
-                with open(target_file, 'r') as file:
-                    data = file.readlines()
-                func_start = None
-                func_end = None
-                indent_level = None
-                for (index, line) in enumerate(data):
-                    stripped = line.lstrip()
-                    indent = len(line) - len(stripped)
-                    if stripped.startswith(f'def {func_name}'):
-                        func_start = index
-                        indent_level = indent
-                    elif func_start is not None and indent <= indent_level and stripped:
-                        func_end = index
-                        break
-                if func_start is not None:
-                    if func_end is not None:
-                        data[func_start:func_end] = [func + '\n']
-                    else:
-                        data[func_start:] = [func + '\n']
-                else:
-                    insert_index = 0
-                    for (i, line) in enumerate(data):
-                        if line.startswith('import ') or line.startswith('from '):
-                            insert_index = i + 1
-                    data.insert(insert_index, '\n' + func + '\n')
-                with open(target_file, 'w') as file:
-                    file.writelines(data)
+        new_func_name = tree.body[0].name
+
+        # Read the current code from the target file
+        with open(target_file, 'r') as file:
+            lines = file.readlines()
+
+        # Check if the function already exists in the file
+        start_index = end_index = -1
+        for index, line in enumerate(lines):
+            if line.strip().startswith(f"def {new_func_name}("):
+                start_index = index
+                break
+
+        # Find the end of the function if it exists
+        if start_index != -1:
+            for i in range(start_index + 1, len(lines)):
+                if lines[i].strip().startswith(
+                        'def ') or not lines[i].startswith('    '):
+                    end_index = i
+                    break
+
+        # Replace or append the function
+        if start_index != -1 and end_index != -1:
+            lines[start_index:end_index] = [func + '\n\n']
+        else:
+            lines.append('\n' + func + '\n')
+
+        # Write the updated code back to the file
+        with open(target_file, 'w') as file:
+            file.writelines(lines)
+
     except Exception as e:
-        print(f'An error occurred while updating the code: {str(e)}')
+        print(f"An error occurred while updating the code: {e}")
+
+
 def get_current_code(
     filepath='/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/self_improve.py'
 ):
@@ -215,20 +186,17 @@ def parse_AI_response_and_update(response, file):
 
 
 def next_iteration(messages, tokens, file):
-    log_iteration_activity(messages, 'Starting new iteration.')
+    print(messages)
     requester = LLMRequester()
-    response = requester.request('gpt4', messages)
-    log_iteration_activity(messages, f'AI response: {response}')
-    parsed_response = parse_AI_response_and_update(response, file)
-    if parsed_response is None:
-        log_iteration_activity(messages, 'No code blocks found in AI response.')
-    else:
-        log_iteration_activity(messages, 'Code blocks parsed and updated.')
-    return {'role': 'assistant', 'content': response}
+    response = requester.request("gpt4", messages, 600)
+    print(parse_AI_response_and_update(response, file))
+    return ({'role': 'assistant', 'content': response})
+
+
 def main():
     print("self_improvement loop started!")
     messages = ["temp"]
-    for i in range(7):  # Run the loop for three iterations
+    for i in range(4):  # Run the loop for three iterations
         try:
             target_file = get_target_file()
             print(target_file)
@@ -243,11 +211,12 @@ esnsure def is directly after python. there should be nothing before or after th
 Existing functions will be replaced, and new ones added. This is the code of the target file.""" + "\n code: \n" + get_current_code(
                 target_file)
             messages[0] = {'role': 'system', 'content': task}
+            print(messages)
             messages.append(next_iteration(messages, 600, target_file))
+            print(messages)
         except Exception as e:
             error_message = str(e)  # Get the error message as a string
             print("An error occurred:", error_message)
-        print(messages)
 
 
 main()
@@ -259,3 +228,25 @@ def check_syntax(code):
         return True
     except SyntaxError:
         return False
+
+
+def log_new_messages(messages, log_file_path, last_read_position_file):
+    try:
+        with open(last_read_position_file, 'r') as file:
+            last_read_position = int(file.read().strip())
+    except (FileNotFoundError, ValueError):
+        last_read_position = 0
+    new_messages = []
+    with open(log_file_path, 'r') as file:
+        file.seek(last_read_position)
+        new_messages = file.readlines()
+        last_read_position = file.tell()
+    for message in new_messages:
+        messages.append({'role': 'log', 'content': message.strip()})
+    with open(last_read_position_file, 'w') as file:
+        file.write(str(last_read_position))
+
+
+def append_new_logs_to_messages(messages, log_file_path,
+                                last_read_position_file):
+    log_new_messages(messages, log_file_path, last_read_position_file)

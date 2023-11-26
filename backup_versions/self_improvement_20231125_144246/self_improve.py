@@ -14,38 +14,6 @@ for directory in MODULE_DIRECTORIES:
 
 from llm_request import LLMRequester
 
-def log_iteration_activity(messages, message_content):
-    import datetime
-    timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    log_entry = f'{timestamp} - {message_content}\n'
-    log_file_path = '/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/iteration_log.log'
-    with open(log_file_path, 'a') as log_file:
-        log_file.write(log_entry)
-    messages.append({'role': 'log', 'content': log_entry.strip()})
-
-
-def log_new_messages(messages, log_file_path, last_read_position_file):
-    try:
-        with open(last_read_position_file, 'r') as file:
-            last_read_position = int(file.read().strip())
-    except (FileNotFoundError, ValueError):
-        last_read_position = 0
-    new_messages = []
-    with open(log_file_path, 'r') as file:
-        file.seek(last_read_position)
-        new_messages = file.readlines()
-        last_read_position = file.tell()
-    for message in new_messages:
-        messages.append({'role': 'log', 'content': message.strip()})
-    with open(last_read_position_file, 'w') as file:
-        file.write(str(last_read_position))
-
-
-def append_new_log_messages(messages):
-    log_file_path = '/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/log_file.log'
-    last_read_position_file = '/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/last_read_position.txt'
-    log_new_messages(messages, log_file_path, last_read_position_file)
-
 
 def read_file(filepath):
     try:
@@ -101,47 +69,55 @@ def extract_function_definitions(code):
     return func_defs
 
 
-#updates code in self_improve.py
-def update_code(func, target_file):
+#updates code in self_improve_simple.py
+def update_code(
+    func,
+    target_file="/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/self_improve.py"
+):
     """
-    Updates the code in self_improve.py with the new function.
-    Inserts the new function at the beginning of the file, after any import statements,
-    or replaces an existing function with the same name.
+    Updates the code in self_improve_simple.py with the new function.
     """
     try:
         tree = ast.parse(func)
         for node in tree.body:
             if isinstance(node, ast.FunctionDef):
                 func_name = node.name
-                with open(target_file, 'r') as file:
+                # Open the file and read the current code
+                with open(target_file, "r") as file:
                     data = file.readlines()
+
+                # Find the start and end of the existing function definition
                 func_start = None
                 func_end = None
                 indent_level = None
-                for (index, line) in enumerate(data):
+                for index, line in enumerate(data):
                     stripped = line.lstrip()
                     indent = len(line) - len(stripped)
-                    if stripped.startswith(f'def {func_name}'):
+
+                    if stripped.startswith(f"def {func_name}"):
                         func_start = index
                         indent_level = indent
                     elif func_start is not None and indent <= indent_level and stripped:
                         func_end = index
                         break
+
+                # If function exists, remove it
                 if func_start is not None:
-                    if func_end is not None:
-                        data[func_start:func_end] = [func + '\n']
-                    else:
-                        data[func_start:] = [func + '\n']
-                else:
-                    insert_index = 0
-                    for (i, line) in enumerate(data):
-                        if line.startswith('import ') or line.startswith('from '):
-                            insert_index = i + 1
-                    data.insert(insert_index, '\n' + func + '\n')
-                with open(target_file, 'w') as file:
+                    if func_end is not None:  # End of function found
+                        data = data[:func_start] + data[func_end:]
+                    else:  # End of function not found (function is at end of file)
+                        data = data[:func_start]
+
+                # Append new function at the end
+                data.append('\n' + func + '\n')
+
+                # Write the updated code back to the file
+                with open(target_file, "w") as file:
                     file.writelines(data)
     except Exception as e:
-        print(f'An error occurred while updating the code: {str(e)}')
+        print(f"An error occurred while updating the code: {str(e)}")
+
+
 def get_current_code(
     filepath='/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/self_improve.py'
 ):
@@ -180,7 +156,10 @@ def restore_code():
     print(f'Restored the backed up file to {filepath}.')
 
 
-def parse_AI_response_and_update(response, file):
+def parse_AI_response_and_update(
+    response,
+    file="/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/self_improve.py"
+):
     """
     Parses the AI response and updates self_improve.py.
     """
@@ -214,21 +193,22 @@ def parse_AI_response_and_update(response, file):
         restore_code()
 
 
-def next_iteration(messages, tokens, file):
-    log_iteration_activity(messages, 'Starting new iteration.')
+def next_iteration(
+    messages,
+    tokens,
+    file="/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/self_improve.py"
+):
+    print(messages)
     requester = LLMRequester()
-    response = requester.request('gpt4', messages)
-    log_iteration_activity(messages, f'AI response: {response}')
-    parsed_response = parse_AI_response_and_update(response, file)
-    if parsed_response is None:
-        log_iteration_activity(messages, 'No code blocks found in AI response.')
-    else:
-        log_iteration_activity(messages, 'Code blocks parsed and updated.')
-    return {'role': 'assistant', 'content': response}
+    response = requester.request("gpt4", messages, 600)
+    print(parse_AI_response_and_update(response, file))
+    return ({'role': 'assistant', 'content': response})
+
+
 def main():
     print("self_improvement loop started!")
     messages = ["temp"]
-    for i in range(7):  # Run the loop for three iterations
+    for i in range(3):  # Run the loop for three iterations
         try:
             target_file = get_target_file()
             print(target_file)
@@ -243,14 +223,16 @@ esnsure def is directly after python. there should be nothing before or after th
 Existing functions will be replaced, and new ones added. This is the code of the target file.""" + "\n code: \n" + get_current_code(
                 target_file)
             messages[0] = {'role': 'system', 'content': task}
+            print(messages)
             messages.append(next_iteration(messages, 600, target_file))
+            print(messages)
         except Exception as e:
             error_message = str(e)  # Get the error message as a string
             print("An error occurred:", error_message)
-        print(messages)
 
 
 main()
+
 
 
 def check_syntax(code):
@@ -259,3 +241,11 @@ def check_syntax(code):
         return True
     except SyntaxError:
         return False
+
+
+
+
+def log_error(error_message):
+    error_log_path = '/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/error_log.txt'
+    with open(error_log_path, 'a') as log_file:
+        log_file.write(f'{error_message}\n')

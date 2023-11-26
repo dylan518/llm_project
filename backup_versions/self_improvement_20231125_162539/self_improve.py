@@ -14,15 +14,6 @@ for directory in MODULE_DIRECTORIES:
 
 from llm_request import LLMRequester
 
-def log_iteration_activity(messages, message_content):
-    import datetime
-    timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    log_entry = f'{timestamp} - {message_content}\n'
-    log_file_path = '/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/iteration_log.log'
-    with open(log_file_path, 'a') as log_file:
-        log_file.write(log_entry)
-    messages.append({'role': 'log', 'content': log_entry.strip()})
-
 
 def log_new_messages(messages, log_file_path, last_read_position_file):
     try:
@@ -105,43 +96,50 @@ def extract_function_definitions(code):
 def update_code(func, target_file):
     """
     Updates the code in self_improve.py with the new function.
-    Inserts the new function at the beginning of the file, after any import statements,
-    or replaces an existing function with the same name.
+    Replaces an existing function with the same name, or inserts the new function at the end.
     """
     try:
         tree = ast.parse(func)
         for node in tree.body:
             if isinstance(node, ast.FunctionDef):
                 func_name = node.name
-                with open(target_file, 'r') as file:
+                # Open the file and read the current code
+                with open(target_file, "r") as file:
                     data = file.readlines()
+
+                # Find the start and end of the existing function definition
                 func_start = None
                 func_end = None
                 indent_level = None
-                for (index, line) in enumerate(data):
+                for index, line in enumerate(data):
                     stripped = line.lstrip()
                     indent = len(line) - len(stripped)
-                    if stripped.startswith(f'def {func_name}'):
+
+                    if stripped.startswith(f"def {func_name}"):
                         func_start = index
                         indent_level = indent
                     elif func_start is not None and indent <= indent_level and stripped:
                         func_end = index
                         break
+
+                # Replace or insert the new function
                 if func_start is not None:
-                    if func_end is not None:
+                    if func_end is not None:  # End of function found
                         data[func_start:func_end] = [func + '\n']
-                    else:
+                    else:  # End of function not found (function is at end of file)
                         data[func_start:] = [func + '\n']
                 else:
-                    insert_index = 0
-                    for (i, line) in enumerate(data):
-                        if line.startswith('import ') or line.startswith('from '):
-                            insert_index = i + 1
-                    data.insert(insert_index, '\n' + func + '\n')
-                with open(target_file, 'w') as file:
+                    # Function does not exist, append it
+                    data.append('\n' + func + '\n')
+
+                # Write the updated code back to the file
+                with open(target_file, "w") as file:
                     file.writelines(data)
+
     except Exception as e:
-        print(f'An error occurred while updating the code: {str(e)}')
+        print(f"An error occurred while updating the code: {str(e)}")
+
+
 def get_current_code(
     filepath='/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/self_improve.py'
 ):
@@ -215,16 +213,12 @@ def parse_AI_response_and_update(response, file):
 
 
 def next_iteration(messages, tokens, file):
-    log_iteration_activity(messages, 'Starting new iteration.')
     requester = LLMRequester()
-    response = requester.request('gpt4', messages)
-    log_iteration_activity(messages, f'AI response: {response}')
-    parsed_response = parse_AI_response_and_update(response, file)
-    if parsed_response is None:
-        log_iteration_activity(messages, 'No code blocks found in AI response.')
-    else:
-        log_iteration_activity(messages, 'Code blocks parsed and updated.')
-    return {'role': 'assistant', 'content': response}
+    response = requester.request("gpt4", messages)
+    print(parse_AI_response_and_update(response, file))
+    return ({'role': 'assistant', 'content': response})
+
+
 def main():
     print("self_improvement loop started!")
     messages = ["temp"]

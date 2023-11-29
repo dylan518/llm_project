@@ -88,6 +88,44 @@ class Main:
             self.PROJECT_DIRECTORY + "/running_tests/unittests/unittest0.py",
             self.PROJECT_DIRECTORY + "/self_improvement/test_file.py")
 
+    def safe_test(self):
+        backup_manager = BackupManager()
+        backup_path = backup_manager.backup_directory()
+        try:
+            task_file_path = self.PROJECT_DIRECTORY + "/running_tests/tasks/test_task0.txt"
+            print(task_file_path)
+            with open(task_file_path, 'r') as task_file:
+                test_task = task_file.read()
+
+            self.task_manager.update_task(test_task)
+
+            test_file_path = os.path.join(self.PROJECT_DIRECTORY,
+                                          "self_improvement", "test_file.py")
+            with open(test_file_path, 'w') as test_file:
+                pass
+            self.task_manager.set_target_file(test_file_path)
+
+            #have self improvement loop complete test task
+            self.task_manager.run_self_improvement_loop(time_limit=3600,
+                                                        request_limit=3)
+            # Test the results
+            test_passed = self.test_validator.validate(
+                self.PROJECT_DIRECTORY +
+                "/running_tests/unittests/unittest0.py",
+                self.PROJECT_DIRECTORY + "/self_improvement/test_file.py")
+            if not test_passed:
+                print(
+                    "Test failed. Consider restoring from backup if necessary."
+                )
+                # Optionally restore the backup
+                # backup_manager.restore_directory()
+            else:
+                backup_manager.set_last_good_version(backup_path)
+                print("Test passed.")
+
+        except Exception as e:
+            print(f"An error occurred during the test: {e}")
+
 
 if __name__ == "__main__":
     main = Main()

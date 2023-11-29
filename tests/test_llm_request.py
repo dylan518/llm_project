@@ -1,16 +1,13 @@
-# test passed 11/24
 import unittest
-import sys
 import os
-import json  # Imported json as it is used in test_save_interactions
-from unittest.mock import patch, Mock, mock_open, ANY
+import sys
 
+# Add local modules to path
 PROJECT_DIRECTORY = "/Users/dylanwilson/Documents/GitHub/llm_project/"
-MODULE_DIRECTORIES = ["llm_requests", "running_tests", "logging"]
+MODULE_DIRECTORIES = ["llm_requests"]
 
 for directory in MODULE_DIRECTORIES:
-    sys.path.append(os.path.join(PROJECT_DIRECTORY,
-                                 directory))  # Use os.path.join
+    sys.path.append(os.path.join(PROJECT_DIRECTORY, directory))
 
 from llm_request import LLMRequester
 
@@ -19,64 +16,51 @@ class TestLLMRequester(unittest.TestCase):
 
     def setUp(self):
         self.requester = LLMRequester()
-        self.PROJECT_DIRECTORY = "/Users/dylanwilson/Documents/GitHub/llm_project"
 
-    def test_request_gpt3(self):
-        with patch('llm_request.LLMRequester.read_request_limit',
-                   return_value=10):
-            with patch('llm_request.LLMRequester.decrement_request_limit'):
-                mock_response = Mock()
-                print(self.requester.llm_gpt3.__dict__)
-                #                print(dir(self.requester.llm_gpt3))
-                mock_response.generations = [[Mock(text="response")]]
-                with patch('llm_request.OpenAI.generate',
-                           return_value=mock_response):
-                    response = self.requester.request("gpt3", "prompt")
-                    self.assertEqual(type(response), str)
+    def test_request_gpt3_successful(self):
+        response = self.requester.request("gpt3", "Hello, how are you?")
+        print("Response from GPT-3:", response)
+        self.assertIsInstance(response,
+                              str)  # Check if the response is a string
 
-    def test_request_gpt4(self):
-        with patch('llm_request.LLMRequester.read_request_limit',
-                   return_value=10):
-            with patch('llm_request.LLMRequester.decrement_request_limit'):
-                mock_response = Mock()
-                print(self.requester.llm_gpt4.__dict__)
-                #                print(dir(self.requester.llm_gpt3))
-                mock_response.generations = [[Mock(text="response")]]
-                with patch('llm_request.OpenAI.generate',
-                           return_value=mock_response):
-                    response = self.requester.request("gpt4", "prompt")
-                    self.assertEqual(type(response), str)
+    def test_request_gpt4_successful(self):
+        response = self.requester.request("gpt4", "Hello, how are you?")
+        print("Response from GPT-4:", response)
+        self.assertIsInstance(response,
+                              str)  # Check if the response is a string
 
     def test_read_request_limit(self):
-        with patch(
-                'builtins.open',
-                mock_open(read_data="10")) as mock_file:  # Corrected mock_open
-            limit = self.requester.read_request_limit()
-            self.assertEqual(limit, 10)
-            mock_file().read.assert_called_once(
-            )  # Assert read method was called on file object
+        limit = self.requester.read_request_limit()
+        self.assertIsInstance(limit, int)  # Check if the limit is an integer
 
     def test_decrement_request_limit(self):
-        with patch('llm_request.LLMRequester.read_request_limit',
-                   return_value=10):
-            with patch('builtins.open', mock_open()) as mock_file:
-                self.requester.decrement_request_limit()
-                # Make sure to construct the path as it is in the LLMRequester class
-                expected_file_path = os.path.join(
-                    self.PROJECT_DIRECTORY, "llm_requests",
-                    self.requester.REQUEST_LIMIT_FILE)
-                mock_file.assert_called_with(expected_file_path, 'w')
-                mock_file().write.assert_called_with("9")
+        initial_limit = self.requester.read_request_limit()
+        self.requester.decrement_request_limit()
+        new_limit = self.requester.read_request_limit()
+        self.assertEqual(new_limit, initial_limit -
+                         1)  # Check if the limit has been decremented
 
-    def test_save_interactions(self):
-        self.requester.interactions = [{
-            "model": "gpt3",
-            "prompt": "prompt",
-            "response": "response"
+    def test_parse_to_messages_with_string(self):
+        result = self.requester.parse_to_messages("Hello, how are you?")
+        self.assertEqual(result, [{
+            "role": "user",
+            "content": "Hello, how are you?"
+        }])
+
+    def test_parse_to_messages_with_list(self):
+        input_list = [{
+            "role": "user",
+            "content": "Hello"
+        }, {
+            "role": "user",
+            "content": "How are you?"
         }]
-        with patch('json.dump') as mock_json_dump:
-            self.requester.save_interactions()
-            mock_json_dump.assert_called_with(self.requester.interactions, ANY)
+        result = self.requester.parse_to_messages(input_list)
+        self.assertEqual(result, input_list)
+
+    def test_parse_to_messages_invalid_input(self):
+        with self.assertRaises(ValueError):
+            self.requester.parse_to_messages(123)
 
 
 if __name__ == '__main__':

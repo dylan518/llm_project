@@ -14,26 +14,40 @@ for directory in MODULE_DIRECTORIES:
 
 from llm_request import LLMRequester
 
+def test_system(file):
+    try:
+        key_function_result = key_function()
+        if key_function_result == expected_result:
+            return True
+        else:
+            return False
+    except Exception as e:
+        log_iteration_activity([], 'System test failed: ' + str(e))
+        return False
+def eval_python_code(code):
+    try:
+        exec(code)
+        return True
+    except Exception as e:
+        log_iteration_activity([],
+                               f'Error while evaluating Python code: {str(e)}')
+        return False
 
-def log_iteration_activity(messages,
-                           message_content,
-                           current_iteration=None,
-                           total_iterations=None):
+
+def log_iteration_activity(messages, message_content, current_iteration=None, total_iterations=None):
     import datetime
     timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     iteration_info = ''
     if current_iteration is not None and total_iterations is not None:
-        remaining_iterations = total_iterations - current_iteration
-        iteration_info = f' (Iteration {current_iteration}/{total_iterations}, {remaining_iterations} left)'
-    log_entry = f'{timestamp}{iteration_info} - {message_content}\n'
+        iteration_info = f'Iteration {current_iteration} of {total_iterations}'
+    else:
+        iteration_info = 'Iteration information not provided'
+    log_entry = f'{timestamp} - {iteration_info} - {message_content}\n'
     log_file_path = '/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/iteration_log.log'
     with open(log_file_path, 'a') as log_file:
         log_file.write(log_entry)
-    if message_content != 'Starting new iteration.' or (
-            current_iteration == 1 and total_iterations is not None):
+    if messages is not None:
         messages.append({'role': 'assistant', 'content': log_entry.strip()})
-
-
 def log_new_messages(messages, log_file_path, last_read_position_file):
     try:
         with open(last_read_position_file, 'r') as file:
@@ -82,18 +96,26 @@ def get_target_file():
 #extracts python code from gpt output
 def extract_python_code(gpt_output):
     try:
-        python_code_blocks = re.findall(r'```python(.*?)```', gpt_output,
-                                        re.DOTALL)
+        python_code_blocks = []
+        block_start = None
 
-        # Remove leading/trailing whitespace from each code block
-        python_code_blocks = [code.strip() for code in python_code_blocks]
+        lines = gpt_output.split('\n')
+        for i, line in enumerate(lines):
+            if '```python' in line and block_start is None:
+                block_start = i
+            elif '```' in line and block_start is not None:
+                code_block = '\n'.join(lines[block_start + 1:i])
+                python_code_blocks.append(code_block.strip())
+                block_start = None
 
         print(python_code_blocks)
-
         return python_code_blocks
+
     except Exception as e:
-        print(f"An error occurred while extracting Python code: {str(e)}")
-        print("nothing parsed")
+        error_message = f"An error occurred while extracting Python code: {str(e)}"
+        print(error_message)
+        # Assuming log_iteration_activity is defined elsewhere
+        log_iteration_activity([], error_message)
         return None
 
 
@@ -201,11 +223,11 @@ def backup_code():
     print(f'Backup of {filepath} created at {backup_path}')
 
 
-def restore_code():
+def restore_code(file):
     """
     Restores the code from the backup file.
     """
-    filepath = '/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/self_improve.py'
+    filepath = file
     backup_path = filepath + '_backup'
 
     # Check if the backup file exists
@@ -221,16 +243,13 @@ def restore_code():
         print(f'Backup file not found: {backup_path}')
 
 
-def parse_AI_response_and_update(response, file):
-    """
-    Parses the AI response and updates self_improve.py.
-    """
+def parse_AI_response_and_update(response, file, current_iteration):
     code_updated = False
     try:
         backup_code()
         code_blocks = extract_python_code(response)
         if not code_blocks:
-            log_iteration_activity([], 'No code blocks found in AI response.')
+            log_iteration_activity([], 'No code blocks found in AI response.', current_iteration)
             return None
         for code in code_blocks:
             func_defs = extract_function_definitions(code)
@@ -238,26 +257,28 @@ def parse_AI_response_and_update(response, file):
                 for func_def in func_defs:
                     try:
                         ast.parse(func_def)
-                        update_code(func_def, file)
-                        code_updated = True
-                    except SyntaxError:
-                        restore_code()
+                        if eval_python_code(func_def):
+                            update_code(func_def, file)
+                            code_updated = True
+                        else:
+                            restore_code(file)
+                            continue
+                    except SyntaxError as e:
+                        log_iteration_activity([], f'Syntax error in function definition: {e.text}', current_iteration)
+                        restore_code(file)
                         return False
         if code_updated:
-            os.remove(file + '_backup')
-            log_iteration_activity([], 'Code blocks parsed and updated.')
+            if os.path.exists(file + '_backup'):
+                os.remove(file + '_backup')
+            log_iteration_activity([], 'Code blocks parsed and updated.', current_iteration)
             return True
         else:
-            restore_code()
-            log_iteration_activity([],
-                                   'No new code blocks were found or added.')
+            log_iteration_activity([], 'No new code blocks were found or added.', current_iteration)
             return False
     except Exception as e:
-        print(f'Found an error: {str(e)}')
-        restore_code()
+        log_iteration_activity([], f'Found an error: {str(e)}', current_iteration)
+        restore_code(file)
         return False
-
-
 def next_iteration(logs, file):
     log_iteration_activity(logs, 'Starting new iteration.')
     requester = LLMRequester()
@@ -278,7 +299,8 @@ def next_iteration(logs, file):
 def main():
     print("self_improvement loop started!")
     messages = ["temp"]
-    for i in range(5):  # Run the loop for three iterations
+    iterations = 10
+    for i in range(iterations):  # Run the loop for n iterations
         try:
             target_file = get_target_file()
             print(target_file)
@@ -287,9 +309,9 @@ To add pyhton functions to the codefile generate Python functions in this format
 
 ```python
 def example_function():
-    pass
+    print('This is a simple example function that prints out a message.')
 ``
-esnsure def is directly after python. there should be nothing before or after the function. All imports will automatically be handle don't add imports
+esnsure def is directly after python and that ```python and ``` are on their own lines. there should be nothing before or after the function. All imports will automatically be handle don't add imports
 Existing functions will be replaced, and new ones added. This is the code of the target file.""" + "\n code: \n" + get_current_code(
                 target_file)
             messages[0] = {'role': 'assistant', 'content': task}

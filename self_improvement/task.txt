@@ -1,11 +1,6 @@
-Task: Palindrome Checker
+As an AI model, your ongoing mission is to improve the code that calls you in 'self_improve_simple.py', so that it can complete tasks in tasks.txt. the goal is a self-improving ai. 
 
-Your task is to develop a function that checks if a given string is a palindrome. A palindrome is a word, phrase, number, or other sequences of characters that reads the same forward and backward (ignoring spaces, punctuation, and capitalization).
-
-Specifications:
-
-Palindrome Checker:
-Write a function named is_palindrome(s: str) -> bool that takes in a string s and returns True if it's a palindrome and False otherwise.
-Constraints:
-The function should ignore spaces, punctuation, and capitalization when determining if a string is a palindrome.
-The function should be efficient and handle strings of varying lengths.
+IMPORTANT : Don't write comments for where code will be replaced for brevity as the function will be parsed in its entirety and don't use any paths that are'nt functional.
+Update the functions' info and error logging so when exceptions are thrown it logs with iteration paramater.
+brief description of the code: This system facilitates a self-improvement loop with GPT to optimize its own code. The next_iteration function sends the current code and task to GPT, and GPT responds with suggestions to improve the code. The extract_python_code function retrieves Python code blocks from GPT's response, and the update_code function integrates these suggestions into self_improve.py. The main loop in main(): continuously sends the code to GPT for feedback and applies the returned improvements. In essence, the system continuously refines its own code by consulting GPT, extracting the AI's code suggestions, and integrating them.
+Note: At the end of each loop the system will be tested on a very simple coding task and will be restored if it doesn't pass, so ensure the system is up and running by the end of the loop.

@@ -56,6 +56,25 @@ class LLMRequester:
                 "Prompt must be a string or a list of dictionaries with 'role' and 'content' keys."
             )
 
+    def save_solo_interaction(
+            self,
+            filename="interactions.json"  # Use a default filename, relative path
+    ):
+        # Construct the full file path
+        full_path = os.path.join(self.PROJECT_PATH, "llm_requests", filename)
+
+        try:
+            if self.interactions:
+                last_interaction = self.interactions[-1]
+                with open(full_path, 'a') as file:  # Open in append mode
+                    json.dump(last_interaction, file)
+                    file.write("\n")  # Add a newline for readability
+            else:
+                print("No interactions to save.")
+        except Exception as e:
+            import traceback
+            traceback.print_exc()  # Print full stack trace
+
     def request(self, model, prompt, tokens=4000, retries=3, delay=10):
         model_map = {
             "gpt3": "gpt-3.5-turbo-1106",
@@ -86,6 +105,8 @@ class LLMRequester:
                         "prompt": prompt,
                         "response": method_code
                     })
+                    self.save_solo_interaction(str(self.interactions))
+
                     return method_code
             except Exception as e:
                 print(
@@ -103,18 +124,3 @@ class LLMRequester:
                 json.dump(self.interactions, file)
         except Exception as e:
             print(f"Error saving interactions: {str(e)}")
-
-    def save_solo_interaction(
-        self,
-        filename="/Users/dylanwilson/Documents/GitHub/llm_project/llm_request/interactions.json"
-    ):
-        # Saves only the last interaction
-        try:
-            if self.interactions:
-                last_interaction = self.interactions[-1]
-                with open(filename, 'w') as file:
-                    json.dump(last_interaction, file)
-            else:
-                print("No interactions to save.")
-        except Exception as e:
-            print(f"Error saving interaction: {str(e)}")

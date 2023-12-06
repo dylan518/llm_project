@@ -1,0 +1,16 @@
+
+ERRORS:
+========================================
+E
+======================================================================
+ERROR: test_palindrome (__main__.PalindromeTester)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/folders/r_/0pzlm9c91ln8y8wlzmj2q14m0000gn/T/tmprfkefjrr/temp_test_file.py", line 15, in setUp
+    from test_file import is_palindrome
+ImportError: cannot import name 'is_palindrome' from 'test_file' (/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/test_file.py)
+
+----------------------------------------------------------------------
+Ran 1 test in 0.004s
+
+FAILED (errors=1)

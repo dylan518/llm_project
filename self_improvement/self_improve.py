@@ -14,16 +14,39 @@ for directory in MODULE_DIRECTORIES:
 
 from llm_request import LLMRequester
 
-def test_system(file):
-    try:
-        key_function_result = key_function()
-        if key_function_result == expected_result:
-            return True
-        else:
-            return False
-    except Exception as e:
-        log_iteration_activity([], 'System test failed: ' + str(e))
-        return False
+
+def collect_logs(log_file_path, logs_start_time):
+    """
+    Collects logs by parsing the log file since the loop started and appends them to the messages.
+    
+    Parameters:
+    log_file_path (str): The path to the log file.
+    logs_start_time (str): The start time of the logs in the format 'YYYY-MM-DD HH:MM:SS'.
+    
+    Returns:
+    list: A list of dicts representing the collected logs with 'role' and 'content'.
+    """
+    import datetime
+    logs_start_datetime = datetime.datetime.strptime(logs_start_time,
+                                                     '%Y-%m-%d %H:%M:%S')
+    collected_logs = []
+    with open(log_file_path, 'r') as log_file:
+        for line in log_file:
+            end_of_timestamp_index = line.find(' -') + 1
+            log_timestamp_str = line[:end_of_timestamp_index].strip()
+            log_timestamp = datetime.datetime.strptime(log_timestamp_str,
+                                                       '%Y-%m-%d %H:%M:%S')
+            if log_timestamp >= logs_start_datetime:
+                content_start_index = line.find('-') + 2
+                log_content = line[content_start_index:].strip()
+                log_role = 'system' if 'Iteration' in log_content else 'assistant'
+                collected_logs.append({
+                    'role': log_role,
+                    'content': log_content
+                })
+    return collected_logs
+
+
 def eval_python_code(code):
     try:
         exec(code)
@@ -34,20 +57,27 @@ def eval_python_code(code):
         return False
 
 
-def log_iteration_activity(messages, message_content, current_iteration=None, total_iterations=None):
+def log_iteration_activity(messages,
+                           message_content,
+                           log_category='info',
+                           current_iteration=None,
+                           total_iterations=None):
     import datetime
     timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     iteration_info = ''
     if current_iteration is not None and total_iterations is not None:
-        iteration_info = f'Iteration {current_iteration} of {total_iterations}'
-    else:
-        iteration_info = 'Iteration information not provided'
-    log_entry = f'{timestamp} - {iteration_info} - {message_content}\n'
+        iteration_info = f'Iteration {current_iteration} of {total_iterations} - '
+    log_entry = f'[{log_category.upper()}] {timestamp} - {iteration_info}{message_content}\n'
     log_file_path = '/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/iteration_log.log'
+    messages.append({
+        'role': 'system',
+        'content': log_entry.strip(),
+        'category': log_category
+    })
     with open(log_file_path, 'a') as log_file:
         log_file.write(log_entry)
-    if messages is not None:
-        messages.append({'role': 'assistant', 'content': log_entry.strip()})
+
+
 def log_new_messages(messages, log_file_path, last_read_position_file):
     try:
         with open(last_read_position_file, 'r') as file:
@@ -67,8 +97,10 @@ def log_new_messages(messages, log_file_path, last_read_position_file):
 
 def append_new_log_messages(messages):
     log_file_path = '/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/log_file.log'
-    last_read_position_file = '/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/last_read_position.txt'
-    log_new_messages(messages, log_file_path, last_read_position_file)
+    with open(log_file_path, 'r') as file:
+        new_messages = file.readlines()
+    for message in new_messages:
+        messages.append({'role': 'assistant', 'content': message.strip()})
 
 
 def read_file(filepath):
@@ -243,13 +275,13 @@ def restore_code(file):
         print(f'Backup file not found: {backup_path}')
 
 
-def parse_AI_response_and_update(response, file, current_iteration):
+def parse_AI_response_and_update(response, file):
     code_updated = False
     try:
         backup_code()
         code_blocks = extract_python_code(response)
         if not code_blocks:
-            log_iteration_activity([], 'No code blocks found in AI response.', current_iteration)
+            log_iteration_activity([], 'No code blocks found in AI response.')
             return None
         for code in code_blocks:
             func_defs = extract_function_definitions(code)
@@ -264,21 +296,26 @@ def parse_AI_response_and_update(response, file, current_iteration):
                             restore_code(file)
                             continue
                     except SyntaxError as e:
-                        log_iteration_activity([], f'Syntax error in function definition: {e.text}', current_iteration)
+                        log_iteration_activity(
+                            [],
+                            f'Syntax error in function definition: {e.text}')
                         restore_code(file)
                         return False
         if code_updated:
             if os.path.exists(file + '_backup'):
                 os.remove(file + '_backup')
-            log_iteration_activity([], 'Code blocks parsed and updated.', current_iteration)
+            log_iteration_activity([], 'Code blocks parsed and updated.')
             return True
         else:
-            log_iteration_activity([], 'No new code blocks were found or added.', current_iteration)
+            log_iteration_activity([],
+                                   'No new code blocks were found or added.')
             return False
     except Exception as e:
-        log_iteration_activity([], f'Found an error: {str(e)}', current_iteration)
+        log_iteration_activity([], f'Found an error: {str(e)}')
         restore_code(file)
         return False
+
+
 def next_iteration(logs, file):
     log_iteration_activity(logs, 'Starting new iteration.')
     requester = LLMRequester()
@@ -293,32 +330,45 @@ def next_iteration(logs, file):
         log_iteration_activity(logs, 'No code blocks found in AI response.')
     else:
         log_iteration_activity(logs, 'Code blocks parsed and updated.')
-    return {'role': 'assistant', 'content': response}
+    return {'role': 'system', 'content': response}
 
 
 def main():
-    print("self_improvement loop started!")
-    messages = ["temp"]
-    iterations = 10
-    for i in range(iterations):  # Run the loop for n iterations
-        try:
-            target_file = get_target_file()
-            print(target_file)
-            task = get_task() + """
-To add pyhton functions to the codefile generate Python functions in this format:
+    try:
+        log_iteration_activity([], 'Self-improvement loop started!')
+        target_file = get_target_file()
+        task = get_task() + """
+    To add python functions to the codefile generate Python functions in this format:
 
-```python
-def example_function():
+    ```python
+    def example_function():
     print('This is a simple example function that prints out a message.')
-``
-esnsure def is directly after python and that ```python and ``` are on their own lines. there should be nothing before or after the function. All imports will automatically be handle don't add imports
-Existing functions will be replaced, and new ones added. This is the code of the target file.""" + "\n code: \n" + get_current_code(
-                target_file)
-            messages[0] = {'role': 'assistant', 'content': task}
-            messages.append(next_iteration(messages, target_file))
+    ```
+    ensure def is directly after python and that ```python and ``` are on their own lines. there should be nothing before or after the function. All imports will automatically be handled don't add imports.
+    Existing functions will be replaced, and new ones added. This is the code of the target file.""" + "\n code: \n" + get_current_code(
+            target_file)
+    except:
+        log_iteration_activity([], f"An error occurred before starting loop: {error_message}")
+    iterations = 3
+    for i in range(iterations):  # Run the loop for n iterations
+    try:
+        log_iteration_activity([],
+                            'Starting iteration',
+                            current_iteration=i + 1,
+                            total_iterations=iterations)
+        try:
+            iteration_result = next_iteration(messages, target_file)
+            messages.append(iteration_result)
+                   log_iteration_activity([],
+                            iteration_result['content'],
+                            current_iteration=i + 1,
+                            total_iterations=iterations)
         except Exception as e:
             error_message = str(e)  # Get the error message as a string
-            print("An error occurred:", error_message)
+            log_iteration_activity([],
+                                   f"An error occurred: {error_message}",
+                                   current_iteration=i + 1,
+                                   total_iterations=iterations)
 
 
 main()

@@ -2,6 +2,7 @@
 import os
 import json
 import time
+from datetime import datetime
 from openai import OpenAI
 
 
@@ -56,24 +57,29 @@ class LLMRequester:
                 "Prompt must be a string or a list of dictionaries with 'role' and 'content' keys."
             )
 
-    def save_solo_interaction(
-            self,
-            filename="interactions.json"  # Use a default filename, relative path
-    ):
-        # Construct the full file path
+    def save_solo_interaction(self, filename="interactions.json"):
         full_path = os.path.join(self.PROJECT_PATH, "llm_requests", filename)
+        print(full_path)
 
         try:
             if self.interactions:
                 last_interaction = self.interactions[-1]
-                with open(full_path, 'a') as file:  # Open in append mode
-                    json.dump(last_interaction, file)
-                    file.write("\n")  # Add a newline for readability
+                # Read existing data and append the new interaction
+                try:
+                    with open(full_path, 'r') as file:
+                        existing_data = json.load(file)
+                except FileNotFoundError:
+                    existing_data = []
+
+                existing_data.append(last_interaction)
+
+                with open(full_path, 'w') as file:
+                    json.dump(existing_data, file, indent=4)  # Pretty print
             else:
                 print("No interactions to save.")
         except Exception as e:
             import traceback
-            traceback.print_exc()  # Print full stack trace
+            traceback.print_exc()
 
     def request(self, model, prompt, tokens=4000, retries=3, delay=10):
         model_map = {
@@ -96,17 +102,22 @@ class LLMRequester:
                 messages = self.parse_to_messages(prompt)
 
                 response = self.client.chat.completions.create(
-                    model=model_map[model], messages=messages, max_tokens=4096)
+                    model=model_map[model],
+                    messages=messages,
+                    max_tokens=tokens)
                 # Correctly extract the message content from the response
                 method_code = response.choices[0].message.content
+                timestamp = datetime.now().strftime(
+                    "%Y-%m-%d %H:%M:%S")  # Format the timestamp
+                self.interactions.append({
+                    "model": model,
+                    "messages": prompt,
+                    "tokens": tokens,
+                    "timestamp": timestamp,  # Include the timestamp
+                    "response": method_code
+                })
                 if method_code:
-                    self.interactions.append({
-                        "model": model,
-                        "prompt": prompt,
-                        "response": method_code
-                    })
-                    self.save_solo_interaction(str(self.interactions))
-
+                    self.save_solo_interaction()
                     return method_code
             except Exception as e:
                 print(
@@ -124,3 +135,8 @@ class LLMRequester:
                 json.dump(self.interactions, file)
         except Exception as e:
             print(f"Error saving interactions: {str(e)}")
+
+
+if __name__ == "__main__":
+    requester = LLMRequester()
+    requester.request("gpt4", "test prompt")

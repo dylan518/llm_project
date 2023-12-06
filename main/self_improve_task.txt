@@ -1,6 +1,16 @@
-As an AI model, your ongoing mission is to improve the code that calls you in 'self_improve_simple.py', so that it can complete tasks in tasks.txt. the goal is a self-improving ai. 
+TASK: Enhance the 'self_improve.py' script to enable it to autonomously refine its functionality using tasks defined in 'tasks.txt'. The ultimate goal is to create a self-improving AI system. To achieve this, adhere to the following guidelines:
 
-IMPORTANT : Don't write comments for where code will be replaced for brevity as the function will be parsed in its entirety and don't use any paths that are'nt functional.
-Update the functions' info and error logging so when exceptions are thrown it logs with iteration paramater.
-brief description of the code: This system facilitates a self-improvement loop with GPT to optimize its own code. The next_iteration function sends the current code and task to GPT, and GPT responds with suggestions to improve the code. The extract_python_code function retrieves Python code blocks from GPT's response, and the update_code function integrates these suggestions into self_improve.py. The main loop in main(): continuously sends the code to GPT for feedback and applies the returned improvements. In essence, the system continuously refines its own code by consulting GPT, extracting the AI's code suggestions, and integrating them.
-Note: At the end of each loop the system will be tested on a very simple coding task and will be restored if it doesn't pass, so ensure the system is up and running by the end of the loop.
+Strategic Planning: Methodically plan the progression of improvements. This involves identifying potential enhancements in the script and devising a roadmap for incremental development.
+Non-repetitive Progression: Ensure that each iteration of the script brings new improvements. Avoid suggesting or implementing the same changes in consecutive iterations.
+Functional Code Production: All code modifications and additions must be fully operational. Refrain from using placeholder comments for brevity or temporary file paths that are not executable.
+
+Code Overview: The 'self_improve.py' script operates in a self-enhancement loop, leveraging GPT for its own code optimization. Key functions include:
+
+next_iteration: Sends the current script and tasks to GPT for improvement suggestions.
+extract_python_code: Extracts Python code blocks from GPT's responses.
+update_code: Integrates GPT's code suggestions into 'self_improve.py'.
+The main loop: Repeatedly requests feedback from GPT and applies code enhancements.
+Operational Note: At the end of each loop, the system undergoes a basic coding test. If it fails, the system will revert to its previous state. Ensure the script remains functional after each iteration.
+
+**temporary task:**
+Write a collect logs function so it collects the logs by parsing since loop started and make those the messages. You won't need the orginal messages as they are included in logs. Use system as role.

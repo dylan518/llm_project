@@ -6,7 +6,7 @@ import os
 import unittest
 from unittest import mock
 
-PROJECT_DIRECTORY = "/Users/dylanwilson/Documents/GitHub/llm_project/"
+PROJECT_DIRECTORY = "/Users/dylan/Documents/GitHub/llm_project/"
 MODULE_DIRECTORIES = [
     "enviroment_setup_and_run", "running_tests", "logging", "self_improvement"
 ]
@@ -39,7 +39,7 @@ class TestSelfImprover(unittest.TestCase):
                         return_value='Test task') as mocked_read_file:
             self.assertEqual(get_task(), 'Test task')
             mocked_read_file.assert_called_with(
-                '/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/task.txt'
+                '/Users/dylan/Documents/GitHub/llm_project/self_improvement/task.txt'
             )
 
     def test_get_target_file(self):
@@ -48,7 +48,7 @@ class TestSelfImprover(unittest.TestCase):
                         return_value='Test target file') as mocked_read_file:
             self.assertEqual(get_target_file(), 'Test target file')
             mocked_read_file.assert_called_with(
-                '/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/task.txt'
+                '/Users/dylan/Documents/GitHub/llm_project/self_improvement/task.txt'
             )
 
     def test_extract_python_code(self):

@@ -8,7 +8,7 @@ from openai import OpenAI
 
 class LLMRequester:
     REQUEST_LIMIT_FILE = "request_limit.txt"
-    PROJECT_PATH = "/Users/dylanwilson/Documents/GitHub/llm_project/"
+    PROJECT_PATH = "/Users/dylan/Documents/GitHub/llm_project/"
 
     def __init__(self):
         os.environ[

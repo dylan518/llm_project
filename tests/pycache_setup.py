@@ -2,7 +2,7 @@
 
 import os
 
-PROJECT_DIRECTORY = "/Users/dylanwilson/Documents/GitHub/llm_project/"
+PROJECT_DIRECTORY = "/Users/dylan/Documents/GitHub/llm_project/"
 MODULE_DIRECTORIES = [
     "main", "llm_requests", "enviroment_setup_and_run", "running_tests",
     "logging", "self_improvement"

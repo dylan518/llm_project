@@ -4,7 +4,7 @@ import sys
 import os
 
 # Assuming your project directory and module directories are correctly set up
-PROJECT_DIRECTORY = "/Users/dylanwilson/Documents/GitHub/llm_project/"
+PROJECT_DIRECTORY = "/Users/dylan/Documents/GitHub/llm_project/"
 MODULE_DIRECTORIES = [
     "enviroment_setup_and_run", "running_tests", "logging", "main"
 ]

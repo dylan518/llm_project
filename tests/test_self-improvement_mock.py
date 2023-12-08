@@ -3,7 +3,7 @@ from unittest import mock
 import os
 import sys
 
-PROJECT_DIRECTORY = "/Users/dylanwilson/Documents/GitHub/llm_project/"
+PROJECT_DIRECTORY = "/Users/dylan/Documents/GitHub/llm_project/"
 MODULE_DIRECTORIES = ["self_improvement"]
 
 for directory in MODULE_DIRECTORIES:

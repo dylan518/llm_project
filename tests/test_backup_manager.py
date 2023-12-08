@@ -5,7 +5,7 @@ import sys
 from unittest.mock import MagicMock, patch
 import shutil  # Import shutil for rmtree
 
-PROJECT_DIRECTORY = "/Users/dylanwilson/Documents/GitHub/llm_project/"
+PROJECT_DIRECTORY = "/Users/dylan/Documents/GitHub/llm_project/"
 MODULE_DIRECTORIES = ["enviroment_setup_and_run", "running_tests", "logging"]
 
 for directory in MODULE_DIRECTORIES:

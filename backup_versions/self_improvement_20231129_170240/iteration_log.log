@@ -451,7 +451,7 @@ def parse_AI_response_and_update(response, file):
             if error_message:
                 raise SyntaxError(error_message)
         if code_updated:
-            os.remove('/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/self_improve.py_backup')
+            os.remove('/Users/dylan/Documents/GitHub/llm_project/self_improvement/self_improve.py_backup')
             return True  # Return True to indicate that code was updated
         else:
             return False  # Return False to indicate that no code was updated
@@ -505,7 +505,7 @@ def parse_AI_response_and_update(response, file):
             if error_message:
                 raise SyntaxError(error_message)
         if code_updated:
-            os.remove('/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/self_improve.py_backup')
+            os.remove('/Users/dylan/Documents/GitHub/llm_project/self_improvement/self_improve.py_backup')
             return True  # Return True to indicate that code was updated
         else:
             return False  # Return False to indicate that no code was updated
@@ -2161,7 +2161,7 @@ def log_iteration_activity(messages, message_content, current_iteration=None, to
     if current_iteration is not None and total_iterations is not None:
         iteration_info = f" (Iteration {current_iteration}/{total_iterations})"
     log_entry = f'{timestamp}{iteration_info} - {message_content}\n'
-    log_file_path = '/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/iteration_log.log'
+    log_file_path = '/Users/dylan/Documents/GitHub/llm_project/self_improvement/iteration_log.log'
     with open(log_file_path, 'a') as log_file:
         log_file.write(log_entry)
     messages.append({'role': 'log', 'content': log_entry.strip()})
@@ -2196,7 +2196,7 @@ def log_iteration_activity(messages, message_content, current_iteration=None, to
         remaining_iterations = total_iterations - current_iteration
         iteration_info = f" (Iteration {current_iteration}/{total_iterations}, {remaining_iterations} left)"
     log_entry = f'{timestamp}{iteration_info} - {message_content}\n'
-    log_file_path = '/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/iteration_log.log'
+    log_file_path = '/Users/dylan/Documents/GitHub/llm_project/self_improvement/iteration_log.log'
     with open(log_file_path, 'a') as log_file:
         log_file.write(log_entry)
     messages.append({'role': 'log', 'content': log_entry.strip()})
@@ -2287,7 +2287,7 @@ def log_iteration_activity(messages, message_content, current_iteration=None, to
         remaining_iterations = total_iterations - current_iteration
         iteration_info = f' (Iteration {current_iteration}/{total_iterations}, {remaining_iterations} left)'
     log_entry = f'{timestamp}{iteration_info} - {message_content}\n'
-    log_file_path = '/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/iteration_log.log'
+    log_file_path = '/Users/dylan/Documents/GitHub/llm_project/self_improvement/iteration_log.log'
     with open(log_file_path, 'a') as log_file:
         log_file.write(log_entry)
     messages.append({'role': 'log', 'content': log_entry.strip()})
@@ -2335,7 +2335,7 @@ def log_iteration_activity(messages, message_content, current_iteration=None, to
         remaining_iterations = total_iterations - current_iteration
         iteration_info = f' (Iteration {current_iteration}/{total_iterations}, {remaining_iterations} left)'
     log_entry = f'{timestamp}{iteration_info} - {message_content}\n'
-    log_file_path = '/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/iteration_log.log'
+    log_file_path = '/Users/dylan/Documents/GitHub/llm_project/self_improvement/iteration_log.log'
     with open(log_file_path, 'a') as log_file:
         log_file.write(log_entry)
     messages.append({'role': 'log', 'content': log_entry.strip()})
@@ -2383,7 +2383,7 @@ def log_iteration_activity(messages, message_content, current_iteration=None, to
         remaining_iterations = total_iterations - current_iteration
         iteration_info = f' (Iteration {current_iteration}/{total_iterations}, {remaining_iterations} left)'
     log_entry = f'{timestamp}{iteration_info} - {message_content}\n'
-    log_file_path = '/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/iteration_log.log'
+    log_file_path = '/Users/dylan/Documents/GitHub/llm_project/self_improvement/iteration_log.log'
     with open(log_file_path, 'a') as log_file:
         log_file.write(log_entry)
     messages.append({'role': 'log', 'content': log_entry.strip()})
@@ -2507,7 +2507,7 @@ def log_iteration_activity(messages, message_content, current_iteration=None, to
         remaining_iterations = total_iterations - current_iteration
         iteration_info = f' (Iteration {current_iteration}/{total_iterations}, {remaining_iterations} left)'
     log_entry = f'{timestamp}{iteration_info} - {message_content}\n'
-    log_file_path = '/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/iteration_log.log'
+    log_file_path = '/Users/dylan/Documents/GitHub/llm_project/self_improvement/iteration_log.log'
     with open(log_file_path, 'a') as log_file:
         log_file.write(log_entry)
     if message_content != 'Starting new iteration.':
@@ -2527,7 +2527,7 @@ def log_iteration_activity(messages, message_content, current_iteration=None, to
         remaining_iterations = total_iterations - current_iteration
         iteration_info = f' (Iteration {current_iteration}/{total_iterations}, {remaining_iterations} left)'
     log_entry = f'{timestamp}{iteration_info} - {message_content}\n'
-    log_file_path = '/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/iteration_log.log'
+    log_file_path = '/Users/dylan/Documents/GitHub/llm_project/self_improvement/iteration_log.log'
     with open(log_file_path, 'a') as log_file:
         log_file.write(log_entry)
     if message_content != 'Starting new iteration.':
@@ -2559,7 +2559,7 @@ def log_iteration_activity(messages, message_content, current_iteration=None, to
         remaining_iterations = total_iterations - current_iteration
         iteration_info = f' (Iteration {current_iteration}/{total_iterations}, {remaining_iterations} left)'
     log_entry = f'{timestamp}{iteration_info} - {message_content}\n'
-    log_file_path = '/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/iteration_log.log'
+    log_file_path = '/Users/dylan/Documents/GitHub/llm_project/self_improvement/iteration_log.log'
     with open(log_file_path, 'a') as log_file:
         log_file.write(log_entry)
     if message_content != 'Starting new iteration.' or (current_iteration == 1 and total_iterations is not None):
@@ -2579,7 +2579,7 @@ def log_iteration_activity(messages, message_content, current_iteration=None, to
         remaining_iterations = total_iterations - current_iteration
         iteration_info = f' (Iteration {current_iteration}/{total_iterations}, {remaining_iterations} left)'
     log_entry = f'{timestamp}{iteration_info} - {message_content}\n'
-    log_file_path = '/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/iteration_log.log'
+    log_file_path = '/Users/dylan/Documents/GitHub/llm_project/self_improvement/iteration_log.log'
     with open(log_file_path, 'a') as log_file:
         log_file.write(log_entry)
     if message_content != 'Starting new iteration.' or (current_iteration == 1 and total_iterations is not None):
@@ -2611,7 +2611,7 @@ def log_iteration_activity(messages, message_content, current_iteration=None, to
         remaining_iterations = total_iterations - current_iteration
         iteration_info = f' (Iteration {current_iteration}/{total_iterations}, {remaining_iterations} left)'
     log_entry = f'{timestamp}{iteration_info} - {message_content}\n'
-    log_file_path = '/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/iteration_log.log'
+    log_file_path = '/Users/dylan/Documents/GitHub/llm_project/self_improvement/iteration_log.log'
     with open(log_file_path, 'a') as log_file:
         log_file.write(log_entry)
     if message_content != 'Starting new iteration.' or (current_iteration == 1 and total_iterations is not None):
@@ -2631,7 +2631,7 @@ def log_iteration_activity(messages, message_content, current_iteration=None, to
         remaining_iterations = total_iterations - current_iteration
         iteration_info = f' (Iteration {current_iteration}/{total_iterations}, {remaining_iterations} left)'
     log_entry = f'{timestamp}{iteration_info} - {message_content}\n'
-    log_file_path = '/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/iteration_log.log'
+    log_file_path = '/Users/dylan/Documents/GitHub/llm_project/self_improvement/iteration_log.log'
     with open(log_file_path, 'a') as log_file:
         log_file.write(log_entry)
     if message_content != 'Starting new iteration.' or (current_iteration == 1 and total_iterations is not None):
@@ -2665,7 +2665,7 @@ def log_iteration_activity(messages, message_content, current_iteration=None, to
         remaining_iterations = total_iterations - current_iteration
         iteration_info = f' (Iteration {current_iteration}/{total_iterations}, {remaining_iterations} left)'
     log_entry = f'{timestamp}{iteration_info} - {message_content}\n'
-    log_file_path = '/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/iteration_log.log'
+    log_file_path = '/Users/dylan/Documents/GitHub/llm_project/self_improvement/iteration_log.log'
     with open(log_file_path, 'a') as log_file:
         log_file.write(log_entry)
     if message_content != 'Starting new iteration.' or (current_iteration == 1 and total_iterations is not None):
@@ -2683,7 +2683,7 @@ def log_iteration_activity(messages, message_content, current_iteration=None, to
         remaining_iterations = total_iterations - current_iteration
         iteration_info = f' (Iteration {current_iteration}/{total_iterations}, {remaining_iterations} left)'
     log_entry = f'{timestamp}{iteration_info} - {message_content}\n'
-    log_file_path = '/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/iteration_log.log'
+    log_file_path = '/Users/dylan/Documents/GitHub/llm_project/self_improvement/iteration_log.log'
     with open(log_file_path, 'a') as log_file:
         log_file.write(log_entry)
     if message_content != 'Starting new iteration.' or (current_iteration == 1 and total_iterations is not None):
@@ -2717,7 +2717,7 @@ def log_iteration_activity(messages, message_content, current_iteration=None, to
         remaining_iterations = total_iterations - current_iteration
         iteration_info = f' (Iteration {current_iteration}/{total_iterations}, {remaining_iterations} left)'
     log_entry = f'{timestamp}{iteration_info} - {message_content}\n'
-    log_file_path = '/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/iteration_log.log'
+    log_file_path = '/Users/dylan/Documents/GitHub/llm_project/self_improvement/iteration_log.log'
     with open(log_file_path, 'a') as log_file:
         log_file.write(log_entry)
     if message_content != 'Starting new iteration.' or (current_iteration == 1 and total_iterations is not None):
@@ -2735,7 +2735,7 @@ def log_iteration_activity(messages, message_content, current_iteration=None, to
         remaining_iterations = total_iterations - current_iteration
         iteration_info = f' (Iteration {current_iteration}/{total_iterations}, {remaining_iterations} left)'
     log_entry = f'{timestamp}{iteration_info} - {message_content}\n'
-    log_file_path = '/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/iteration_log.log'
+    log_file_path = '/Users/dylan/Documents/GitHub/llm_project/self_improvement/iteration_log.log'
     with open(log_file_path, 'a') as log_file:
         log_file.write(log_entry)
     if message_content != 'Starting new iteration.' or (current_iteration == 1 and total_iterations is not None):
@@ -2769,7 +2769,7 @@ def log_iteration_activity(messages, message_content, current_iteration=None, to
         remaining_iterations = total_iterations - current_iteration
         iteration_info = f' (Iteration {current_iteration}/{total_iterations}, {remaining_iterations} left)'
     log_entry = f'{timestamp}{iteration_info} - {message_content}\n'
-    log_file_path = '/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/iteration_log.log'
+    log_file_path = '/Users/dylan/Documents/GitHub/llm_project/self_improvement/iteration_log.log'
     with open(log_file_path, 'a') as log_file:
         log_file.write(log_entry)
     if message_content != 'Starting new iteration.' or (current_iteration == 1 and total_iterations is not None):
@@ -2787,7 +2787,7 @@ def log_iteration_activity(messages, message_content, current_iteration=None, to
         remaining_iterations = total_iterations - current_iteration
         iteration_info = f' (Iteration {current_iteration}/{total_iterations}, {remaining_iterations} left)'
     log_entry = f'{timestamp}{iteration_info} - {message_content}\n'
-    log_file_path = '/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/iteration_log.log'
+    log_file_path = '/Users/dylan/Documents/GitHub/llm_project/self_improvement/iteration_log.log'
     with open(log_file_path, 'a') as log_file:
         log_file.write(log_entry)
     if message_content != 'Starting new iteration.' or (current_iteration == 1 and total_iterations is not None):
@@ -2821,7 +2821,7 @@ def log_iteration_activity(messages, message_content, current_iteration=None, to
         remaining_iterations = total_iterations - current_iteration
         iteration_info = f' (Iteration {current_iteration}/{total_iterations}, {remaining_iterations} left)'
     log_entry = f'{timestamp}{iteration_info} - {message_content}\n'
-    log_file_path = '/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/iteration_log.log'
+    log_file_path = '/Users/dylan/Documents/GitHub/llm_project/self_improvement/iteration_log.log'
     with open(log_file_path, 'a') as log_file:
         log_file.write(log_entry)
     if message_content != 'Starting new iteration.' or (current_iteration == 1 and total_iterations is not None):
@@ -4686,7 +4686,7 @@ def log_iteration_activity(messages,
     if current_iteration is not None:
         iteration_info = f' (Iteration {current_iteration})'  # current_iteration is now logged in every entry
     log_entry = f'{timestamp}{iteration_info} - {message_content}\n'
-    log_file_path = '/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/iteration_log.log'
+    log_file_path = '/Users/dylan/Documents/GitHub/llm_project/self_improvement/iteration_log.log'
     with open(log_file_path, 'a') as log_file:
         log_file.write(log_entry)
     messages.append({'role': 'assistant', 'content': log_entry.strip()})

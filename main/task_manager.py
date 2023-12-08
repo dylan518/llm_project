@@ -1,7 +1,7 @@
 import sys
 import os
 
-PROJECT_DIRECTORY = "/Users/dylanwilson/Documents/GitHub/llm_project"
+PROJECT_DIRECTORY = "/Users/dylan/Documents/GitHub/llm_project"
 
 MODULE_DIRECTORIES = ["enviroment_setup_and_run"]
 for directory in MODULE_DIRECTORIES:
@@ -15,7 +15,7 @@ class TaskManager:
                  task_file_path="/self_improvement/task.txt",
                  target_file_path="/self_improvement/self_improve.py",
                  target_text="/self_improvement/target_file.txt"):
-        self.PROJECT_DIRECTORY = "/Users/dylanwilson/Documents/GitHub/llm_project"
+        self.PROJECT_DIRECTORY = "/Users/dylan/Documents/GitHub/llm_project"
         self.task_file_path = self.PROJECT_DIRECTORY + task_file_path
         self.target_file_path = self.PROJECT_DIRECTORY + target_file_path
         self.target_text = self.PROJECT_DIRECTORY + target_text

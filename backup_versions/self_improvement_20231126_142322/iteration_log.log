@@ -451,7 +451,7 @@ def parse_AI_response_and_update(response, file):
             if error_message:
                 raise SyntaxError(error_message)
         if code_updated:
-            os.remove('/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/self_improve.py_backup')
+            os.remove('/Users/dylan/Documents/GitHub/llm_project/self_improvement/self_improve.py_backup')
             return True  # Return True to indicate that code was updated
         else:
             return False  # Return False to indicate that no code was updated
@@ -505,7 +505,7 @@ def parse_AI_response_and_update(response, file):
             if error_message:
                 raise SyntaxError(error_message)
         if code_updated:
-            os.remove('/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/self_improve.py_backup')
+            os.remove('/Users/dylan/Documents/GitHub/llm_project/self_improvement/self_improve.py_backup')
             return True  # Return True to indicate that code was updated
         else:
             return False  # Return False to indicate that no code was updated

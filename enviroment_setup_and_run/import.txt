@@ -1,4 +1,4 @@
-import openai
+from openai import OpenAI
 import requests
 from bs4 import BeautifulSoup  # beautifulsoup4
 import lxml
@@ -22,12 +22,10 @@ import pytest
 from unittest import mock
 import unittest
 from pydantic import BaseModel
-import tensorflow as tf
 import torch  
 from sklearn import datasets  
 import nltk
 import gensim
-from flair import data, models  
 import dash
 import plotly.graph_objects as go
 from bokeh.plotting import figure

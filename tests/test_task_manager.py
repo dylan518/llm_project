@@ -4,7 +4,7 @@ import sys
 import unittest
 from unittest.mock import patch, mock_open
 
-PROJECT_DIRECTORY = "/Users/dylanwilson/Documents/GitHub/llm_project/"
+PROJECT_DIRECTORY = "/Users/dylan/Documents/GitHub/llm_project/"
 MODULE_DIRECTORIES = [
     "main", "llm_requests", "enviroment_setup_and_run", "running_tests",
     "logging"
@@ -50,7 +50,7 @@ class TestTaskManager(unittest.TestCase):
 
     def test_set_target_file(self):
         target = "target.py"
-        expected_file_path = '/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/target_file.txt'
+        expected_file_path = '/Users/dylan/Documents/GitHub/llm_project/self_improvement/target_file.txt'
         with patch("builtins.open", mock_open()) as mock_file:
             self.manager.set_target_file(target)
             mock_file.assert_called_once_with(expected_file_path, 'w')

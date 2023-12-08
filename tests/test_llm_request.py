@@ -3,7 +3,7 @@ import os
 import sys
 
 # Add local modules to path
-PROJECT_DIRECTORY = "/Users/dylanwilson/Documents/GitHub/llm_project/"
+PROJECT_DIRECTORY = "/Users/dylan/Documents/GitHub/llm_project/"
 MODULE_DIRECTORIES = ["llm_requests"]
 
 for directory in MODULE_DIRECTORIES:

@@ -5,7 +5,7 @@ import re
 import ast
 import shutil
 
-PROJECT_DIRECTORY = "/Users/dylanwilson/Documents/GitHub/llm_project/"
+PROJECT_DIRECTORY = "/Users/dylan/Documents/GitHub/llm_project/"
 MODULE_DIRECTORIES = ["llm_requests", "running_tests"]
 
 for directory in MODULE_DIRECTORIES:
@@ -51,7 +51,7 @@ def log_iteration_activity(messages,
     if current_iteration is not None and total_iterations is not None:
         iteration_info = f'Iteration {current_iteration} of {total_iterations} - '
     log_entry = f'{timestamp} - {iteration_info}{message_content}\n'
-    log_file_path = '/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/iteration_log.log'
+    log_file_path = '/Users/dylan/Documents/GitHub/llm_project/self_improvement/iteration_log.log'
     messages.append({'role': 'system', 'content': log_entry.strip()})
     with open(log_file_path, 'a') as log_file:
         log_file.write(log_entry)
@@ -75,7 +75,7 @@ def log_new_messages(messages, log_file_path, last_read_position_file):
 
 
 def append_new_log_messages(messages):
-    log_file_path = '/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/log_file.log'
+    log_file_path = '/Users/dylan/Documents/GitHub/llm_project/self_improvement/log_file.log'
     with open(log_file_path, 'r') as file:
         new_messages = file.readlines()
     for message in new_messages:
@@ -94,13 +94,13 @@ def read_file(filepath):
 
 def get_task():
     return read_file(
-        '/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/task.txt'
+        '/Users/dylan/Documents/GitHub/llm_project/self_improvement/task.txt'
     )
 
 
 def get_target_file():
     return read_file(
-        '/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/target_file.txt'
+        '/Users/dylan/Documents/GitHub/llm_project/self_improvement/target_file.txt'
     )
 
 
@@ -209,7 +209,7 @@ def update_code(func, target_file):
 
 
 def get_current_code(
-    filepath='/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/self_improve.py'
+    filepath='/Users/dylan/Documents/GitHub/llm_project/self_improvement/self_improve.py'
 ):
     try:
         with open(filepath, "r") as file:
@@ -228,7 +228,7 @@ def backup_code():
     Arguments:
     filepath -- str: a string that contains the name of the file we want to backup.
     """
-    filepath = '/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/self_improve.py'
+    filepath = '/Users/dylan/Documents/GitHub/llm_project/self_improvement/self_improve.py'
     backup_path = filepath + '_backup'
     shutil.copy2(filepath, backup_path)
     print(f'Backup of {filepath} created at {backup_path}')

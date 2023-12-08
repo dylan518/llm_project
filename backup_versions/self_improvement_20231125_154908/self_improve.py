@@ -5,7 +5,7 @@ import re
 import ast
 import shutil
 
-PROJECT_DIRECTORY = "/Users/dylanwilson/Documents/GitHub/llm_project/"
+PROJECT_DIRECTORY = "/Users/dylan/Documents/GitHub/llm_project/"
 MODULE_DIRECTORIES = ["llm_requests", "running_tests"]
 
 for directory in MODULE_DIRECTORIES:
@@ -26,13 +26,13 @@ def read_file(filepath):
 
 def get_task():
     return read_file(
-        '/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/task.txt'
+        '/Users/dylan/Documents/GitHub/llm_project/self_improvement/task.txt'
     )
 
 
 def get_target_file():
     return read_file(
-        '/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/target_file.txt'
+        '/Users/dylan/Documents/GitHub/llm_project/self_improvement/target_file.txt'
     )
 
 
@@ -114,7 +114,7 @@ def update_code(func, target_file):
 
 
 def get_current_code(
-    filepath='/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/self_improve.py'
+    filepath='/Users/dylan/Documents/GitHub/llm_project/self_improvement/self_improve.py'
 ):
     try:
         with open(filepath, "r") as file:
@@ -133,7 +133,7 @@ def backup_code():
     Arguments:
     filepath -- str: a string that contains the name of the file we want to backup.
     """
-    filepath = '/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/self_improve.py'
+    filepath = '/Users/dylan/Documents/GitHub/llm_project/self_improvement/self_improve.py'
     backup_path = filepath + '_backup'
     shutil.copy2(filepath, backup_path)
     print(f'Backup of {filepath} created at {backup_path}')
@@ -143,7 +143,7 @@ def restore_code():
     """
     Restores the code from the backup file.
     """
-    filepath = '/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/self_improve.py'
+    filepath = '/Users/dylan/Documents/GitHub/llm_project/self_improvement/self_improve.py'
     if os.path.isfile(filepath):
         os.remove(filepath)
     backup_path = filepath + '_backup'
@@ -176,7 +176,7 @@ def parse_AI_response_and_update(response, file):
             if error_message:
                 raise SyntaxError(error_message)
         os.remove(
-            '/Users/dylanwilson/Documents/GitHub/llm_project/self_improvement/self_improve.py_backup'
+            '/Users/dylan/Documents/GitHub/llm_project/self_improvement/self_improve.py_backup'
         )
     except Exception as e:
         error_message = str(e)

@@ -4,7 +4,7 @@ from unittest.mock import patch, Mock
 import os
 import sys
 
-PROJECT_DIRECTORY = "/Users/dylanwilson/Documents/GitHub/llm_project/"
+PROJECT_DIRECTORY = "/Users/dylan/Documents/GitHub/llm_project/"
 MODULE_DIRECTORIES = [
     "main", "llm_requests", "enviroment_setup_and_run", "running_tests",
     "logging"
@@ -19,7 +19,7 @@ class TestTestValidator(unittest.TestCase):
 
     def setUp(self):
         self.validator = TestValidator()
-        self.PROJECT_DIRECTORY = "/Users/dylanwilson/Documents/GitHub/llm_project/"
+        self.PROJECT_DIRECTORY = "/Users/dylan/Documents/GitHub/llm_project/"
 
     def test_create_blank_code_file(self):
         # Test that a blank code file is created

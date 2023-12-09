@@ -76,11 +76,14 @@ class Main:
                                                     request_limit=3)
         # Test the results
         test_passed = self.test_validator.validate(
-            self.PROJECT_DIRECTORY + "/running_tests/unittests/unittest0.py",
-            self.PROJECT_DIRECTORY + "/self_improvement/test_file.py")
+            os.path.join(self.PROJECT_DIRECTORY,
+                         "running_tests/unittests/unittest0.py"),
+            os.path.join(self.PROJECT_DIRECTORY,
+                         "self_improvement/test_file.py"))
 
     def only_test(self):
-        task_file_path = self.PROJECT_DIRECTORY + "/running_tests/tasks/test_task0.txt"
+        task_file_path = os.path.join(self.PROJECT_DIRECTORY,
+                                      "running_tests/tasks/test_task0.txt")
         print(task_file_path)
         with open(task_file_path, 'r') as task_file:
             test_task = task_file.read()
@@ -98,10 +101,13 @@ class Main:
                                                     request_limit=3)
         # Test the results
         test_passed = self.test_validator.validate(
-            self.PROJECT_DIRECTORY + "/running_tests/unittests/unittest0.py",
-            self.PROJECT_DIRECTORY + "/self_improvement/test_file.py")
+            os.path.join(self.PROJECT_DIRECTORY,
+                         "running_tests/unittests/unittest0.py"),
+            os.path.join(self.PROJECT_DIRECTORY,
+                         "self_improvement/test_file.py"))
 
     def safe_test(self):
+
         backup_manager = BackupManager()
         backup_path = backup_manager.backup_directory()
         try:
@@ -123,15 +129,16 @@ class Main:
                                                         request_limit=3)
             # Test the results
             test_passed = self.test_validator.validate(
-                self.PROJECT_DIRECTORY +
-                "/running_tests/unittests/unittest0.py",
-                self.PROJECT_DIRECTORY + "/self_improvement/test_file.py")
+                os.path.join(self.PROJECT_DIRECTORY,
+                             "running_tests/unittests/unittest0.py"),
+                os.path.join(self.PROJECT_DIRECTORY,
+                             "self_improvement/test_file.py"))
             if not test_passed:
                 print(
                     "Test failed. Consider restoring from backup if necessary."
                 )
                 # Optionally restore the backup
-                # backup_manager.restore_directory()
+                backup_manager.restore_directory()
             else:
                 backup_manager.set_last_good_version(backup_path)
                 print("Test passed.")

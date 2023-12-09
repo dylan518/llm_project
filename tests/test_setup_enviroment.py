@@ -9,7 +9,7 @@ PROJECT_DIRECTORY = os.sep.join(
     os.path.abspath(__file__).split(os.sep)
     [:next((i for i, p in enumerate(os.path.abspath(__file__).split(os.sep))
             if 'llm_project' in p), None) +
-     1]) if 'llm_project' in os.path.abspath(__file__) else None + "/"
+     1]) if 'llm_project' in os.path.abspath(__file__) else None
 print(PROJECT_DIRECTORY)
 MODULE_DIRECTORIES = [
     "main", "llm_requests", "enviroment_setup_and_run", "running_tests",

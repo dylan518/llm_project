@@ -4,7 +4,6 @@ import subprocess
 import re
 import ast
 import shutil
-import pathlib
 
 PROJECT_DIRECTORY = os.sep.join(
     os.path.abspath(__file__).split(os.sep)

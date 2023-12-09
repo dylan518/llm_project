@@ -1,5 +1,6 @@
 import unittest
 import sys
+import os
 
 PROJECT_DIRECTORY = os.sep.join(
     os.path.abspath(__file__).split(os.sep)
@@ -9,7 +10,7 @@ PROJECT_DIRECTORY = os.sep.join(
 
 MODULE_DIRECTORIES = ["self_improvement"]
 for directory in MODULE_DIRECTORIES:
-    sys.path.append(PROJECT_DIRECTORY + directory)
+    sys.path.append(os.path.join(PROJECT_DIRECTORY, directory))
 
 
 class PalindromeTester(unittest.TestCase):

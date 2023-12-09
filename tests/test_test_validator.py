@@ -15,7 +15,7 @@ MODULE_DIRECTORIES = [
     "logging"
 ]
 for directory in MODULE_DIRECTORIES:
-    sys.path.append(PROJECT_DIRECTORY + directory)
+    sys.path.append(os.path.join(PROJECT_DIRECTORY, directory))
 from test_validator import TestValidator
 from manage_backups import BackupManager
 

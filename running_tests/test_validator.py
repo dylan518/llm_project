@@ -14,12 +14,11 @@ PROJECT_DIRECTORY = os.sep.join(
 
 MODULE_DIRECTORIES = [
     "main",
-    "llm_requests",
     "enviroment_setup_and_run",
     "running_tests",
 ]
 for directory in MODULE_DIRECTORIES:
-    sys.path.append(PROJECT_DIRECTORY + directory)
+    sys.path.append(os.path.join(PROJECT_DIRECTORY, directory))
 
 from manage_backups import BackupManager
 from setup_and_run import EnvironmentManager
@@ -39,7 +38,8 @@ class TestValidator:
         self.backup_manager = BackupManager()
         self.backup_path = self.backup_manager.BACKUP_DIR
         self.env_manager = EnvironmentManager()
-        self.TASK_DIR = self.PROJECT_DIRECTORY + "running_tests/tasks"
+        self.TASK_DIR = os.path.join(self.PROJECT_DIRECTORY,
+                                     "running_tests/tasks")
         os.makedirs(self.LOG_DIR, exist_ok=True)
 
     def print_file_contents(self, file_path):
@@ -70,7 +70,7 @@ class TestValidator:
         self.env_manager.setup_environment()
         self.print_file_contents(code_file)
         self.print_file_contents(test_file)
-        temp_dir = tempfile.mkdtemp()
+        temp_dir = tempfile.mkdtemp(dir=self.PROJECT_DIRECTORY)
         try:
             # Create a temporary file
             temp_file_path = os.path.join(temp_dir, 'temp_test_file.py')

@@ -5,7 +5,12 @@ import re
 import ast
 import shutil
 
-PROJECT_DIRECTORY = next((p for p in os.path.abspath(__file__).split(os.sep) if 'llm_project' in p), None)
+PROJECT_DIRECTORY = os.sep.join(
+    os.path.abspath(__file__).split(os.sep)
+    [:next((i for i, p in enumerate(os.path.abspath(__file__).split(os.sep))
+            if 'llm_project' in p), None) +
+     1]) if 'llm_project' in os.path.abspath(__file__) else None
+
 MODULE_DIRECTORIES = ["llm_requests", "running_tests"]
 
 for directory in MODULE_DIRECTORIES:
@@ -59,8 +64,7 @@ def read_file(filepath):
 
 def get_task():
     return read_file(
-        '/Users/dylan/Documents/GitHub/llm_project/self_improvement/task.txt'
-    )
+        '/Users/dylan/Documents/GitHub/llm_project/self_improvement/task.txt')
 
 
 def get_target_file():
@@ -124,24 +128,36 @@ def update_code(func, target_file):
                         func_end = index
                         break
                 if func_start is not None:
-                    existing_func_snippet_start = ''.join(data[max(func_start - 3, 0):func_start])
-                    existing_func_snippet_end = ''.join(data[func_start:min(func_start + 3, len(data))])
-                    log_iteration_activity([], f'Replacing function: ...{existing_func_snippet_start}...{existing_func_snippet_end}...')
+                    existing_func_snippet_start = ''.join(
+                        data[max(func_start - 3, 0):func_start])
+                    existing_func_snippet_end = ''.join(
+                        data[func_start:min(func_start + 3, len(data))])
+                    log_iteration_activity(
+                        [],
+                        f'Replacing function: ...{existing_func_snippet_start}...{existing_func_snippet_end}...'
+                    )
                     data[func_start:func_end] = [func + '\n']
                 else:
-                    log_iteration_activity([], f'Adding new function: ...{func[:50]}...')
+                    log_iteration_activity(
+                        [], f'Adding new function: ...{func[:50]}...')
                     insert_index = 0
                     for (i, line) in enumerate(data):
-                        if line.startswith('import ') or line.startswith('from '):
+                        if line.startswith('import ') or line.startswith(
+                                'from '):
                             insert_index = i + 1
                     data.insert(insert_index, '\n' + func + '\n')
                 new_func_snippet_start = func[:50]
                 new_func_snippet_end = func[-50:]
-                log_iteration_activity([], f'New/Updated function: ...{new_func_snippet_start}...{new_func_snippet_end}')
+                log_iteration_activity(
+                    [],
+                    f'New/Updated function: ...{new_func_snippet_start}...{new_func_snippet_end}'
+                )
                 with open(target_file, 'w') as file:
                     file.writelines(data)
     except Exception as e:
         print(f'An error occurred while updating the code: {str(e)}')
+
+
 def get_current_code(
     filepath='/Users/dylan/Documents/GitHub/llm_project/self_improvement/self_improve.py'
 ):
@@ -216,16 +232,22 @@ def parse_AI_response_and_update(response, file):
             return True
         else:
             restore_code()
-            log_iteration_activity([], 'No new code blocks were found or added.')
+            log_iteration_activity([],
+                                   'No new code blocks were found or added.')
             return False
     except Exception as e:
         print(f'Found an error: {str(e)}')
         restore_code()
         return False
+
+
 def next_iteration(logs, file):
     log_iteration_activity(logs, 'Starting new iteration.')
     requester = LLMRequester()
-    formatted_logs = [{'role': log['role'], 'content': log['content']} for log in logs]
+    formatted_logs = [{
+        'role': log['role'],
+        'content': log['content']
+    } for log in logs]
     response = requester.request('gpt4', formatted_logs)
     log_iteration_activity(logs, f'AI response: {response}')
     parsed_response = parse_AI_response_and_update(response, file)
@@ -234,6 +256,8 @@ def next_iteration(logs, file):
     else:
         log_iteration_activity(logs, 'Code blocks parsed and updated.')
     return {'role': 'assistant', 'content': response}
+
+
 def main():
     print("self_improvement loop started!")
     messages = ["temp"]

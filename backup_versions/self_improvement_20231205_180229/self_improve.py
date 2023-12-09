@@ -5,7 +5,12 @@ import re
 import ast
 import shutil
 
-PROJECT_DIRECTORY = next((p for p in os.path.abspath(__file__).split(os.sep) if 'llm_project' in p), None)
+PROJECT_DIRECTORY = os.sep.join(
+    os.path.abspath(__file__).split(os.sep)
+    [:next((i for i, p in enumerate(os.path.abspath(__file__).split(os.sep))
+            if 'llm_project' in p), None) +
+     1]) if 'llm_project' in os.path.abspath(__file__) else None
+
 MODULE_DIRECTORIES = ["llm_requests", "running_tests"]
 
 for directory in MODULE_DIRECTORIES:
@@ -14,8 +19,11 @@ for directory in MODULE_DIRECTORIES:
 
 from llm_request import LLMRequester
 
+
 def end_of_current_iterations():
-    print('The current iteration loop has ended. Awaiting new tasks or instructions.')
+    print(
+        'The current iteration loop has ended. Awaiting new tasks or instructions.'
+    )
 
 
 def collect_and_append_logs(messages, error_message):
@@ -94,8 +102,7 @@ def read_file(filepath):
 
 def get_task():
     return read_file(
-        '/Users/dylan/Documents/GitHub/llm_project/self_improvement/task.txt'
-    )
+        '/Users/dylan/Documents/GitHub/llm_project/self_improvement/task.txt')
 
 
 def get_target_file():

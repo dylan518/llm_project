@@ -7,10 +7,13 @@ from openai import OpenAI
 
 
 class LLMRequester:
-    self.REQUEST_LIMIT_FILE = "request_limit.txt"
-    self.PROJECT_DIRECTORY = PROJECT_DIRECTORY = next(
-        (p for p in os.path.abspath(__file__).split(os.sep)
-         if 'llm_project' in p), None)
+    REQUEST_LIMIT_FILE = "request_limit.txt"
+    PROJECT_PATH = os.sep.join(
+        os.path.abspath(__file__).split(os.sep)
+        [:next((i
+                for i, p in enumerate(os.path.abspath(__file__).split(os.sep))
+                if 'llm_project' in p), None) +
+         1]) if 'llm_project' in os.path.abspath(__file__) else None
 
     def __init__(self):
         os.environ[

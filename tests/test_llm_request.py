@@ -3,12 +3,16 @@ import os
 import sys
 
 # Add local modules to path
-PROJECT_DIRECTORY = next((p for p in os.path.abspath(__file__).split(os.sep) if 'llm_project' in p), None)
+PROJECT_DIRECTORY = os.sep.join(
+    os.path.abspath(__file__).split(os.sep)
+    [:next((i for i, p in enumerate(os.path.abspath(__file__).split(os.sep))
+            if 'llm_project' in p), None) +
+     1]) if 'llm_project' in os.path.abspath(__file__) else None
+print(PROJECT_DIRECTORY)
 MODULE_DIRECTORIES = ["llm_requests"]
 
 for directory in MODULE_DIRECTORIES:
     sys.path.append(os.path.join(PROJECT_DIRECTORY, directory))
-
 from llm_request import LLMRequester
 
 
@@ -24,6 +28,7 @@ class TestLLMRequester(unittest.TestCase):
                               str)  # Check if the response is a string
 
     def test_request_gpt4_successful(self):
+
         response = self.requester.request("gpt4", "Hello, how are you?")
         print("Response from GPT-4:", response)
         self.assertIsInstance(response,

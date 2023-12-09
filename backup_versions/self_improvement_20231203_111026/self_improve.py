@@ -5,7 +5,12 @@ import re
 import ast
 import shutil
 
-PROJECT_DIRECTORY = next((p for p in os.path.abspath(__file__).split(os.sep) if 'llm_project' in p), None)
+PROJECT_DIRECTORY = os.sep.join(
+    os.path.abspath(__file__).split(os.sep)
+    [:next((i for i, p in enumerate(os.path.abspath(__file__).split(os.sep))
+            if 'llm_project' in p), None) +
+     1]) if 'llm_project' in os.path.abspath(__file__) else None
+
 MODULE_DIRECTORIES = ["llm_requests", "running_tests"]
 
 for directory in MODULE_DIRECTORIES:
@@ -14,13 +19,17 @@ for directory in MODULE_DIRECTORIES:
 
 from llm_request import LLMRequester
 
+
 def eval_python_code(code):
     try:
         exec(code)
         return True
     except Exception as e:
-        log_iteration_activity([], f'Error while evaluating Python code: {str(e)}')
+        log_iteration_activity([],
+                               f'Error while evaluating Python code: {str(e)}')
         return False
+
+
 def log_iteration_activity(messages,
                            message_content,
                            current_iteration=None,
@@ -74,8 +83,7 @@ def read_file(filepath):
 
 def get_task():
     return read_file(
-        '/Users/dylan/Documents/GitHub/llm_project/self_improvement/task.txt'
-    )
+        '/Users/dylan/Documents/GitHub/llm_project/self_improvement/task.txt')
 
 
 def get_target_file():
@@ -255,7 +263,9 @@ def parse_AI_response_and_update(response, file):
                             restore_code(file)
                             continue
                     except SyntaxError as e:
-                        log_iteration_activity([], f'Syntax error in function definition: {e.text}')
+                        log_iteration_activity(
+                            [],
+                            f'Syntax error in function definition: {e.text}')
                         restore_code(file)
                         return False
         if code_updated:
@@ -264,12 +274,15 @@ def parse_AI_response_and_update(response, file):
             log_iteration_activity([], 'Code blocks parsed and updated.')
             return True
         else:
-            log_iteration_activity([], 'No new code blocks were found or added.')
+            log_iteration_activity([],
+                                   'No new code blocks were found or added.')
             return False
     except Exception as e:
         log_iteration_activity([], f'Found an error: {str(e)}')
         restore_code(file)
         return False
+
+
 def next_iteration(logs, file):
     log_iteration_activity(logs, 'Starting new iteration.')
     requester = LLMRequester()

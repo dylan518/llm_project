@@ -6,8 +6,11 @@ import ast
 import shutil
 import pathlib
 
-PROJECT_DIRECTORY = next((p for p in pathlib.Path(__file__).resolve().parents
-                          if p.name == 'llm_project'), None)
+PROJECT_DIRECTORY = os.sep.join(
+    os.path.abspath(__file__).split(os.sep)
+    [:next((i for i, p in enumerate(os.path.abspath(__file__).split(os.sep))
+            if 'llm_project' in p), None) +
+     1]) if 'llm_project' in os.path.abspath(__file__) else None
 MODULE_DIRECTORIES = ["llm_requests", "running_tests"]
 
 for directory in MODULE_DIRECTORIES:

@@ -5,7 +5,12 @@ import re
 import ast
 import shutil
 
-PROJECT_DIRECTORY = next((p for p in os.path.abspath(__file__).split(os.sep) if 'llm_project' in p), None)
+PROJECT_DIRECTORY = os.sep.join(
+    os.path.abspath(__file__).split(os.sep)
+    [:next((i for i, p in enumerate(os.path.abspath(__file__).split(os.sep))
+            if 'llm_project' in p), None) +
+     1]) if 'llm_project' in os.path.abspath(__file__) else None
+
 MODULE_DIRECTORIES = ["llm_requests", "running_tests"]
 
 for directory in MODULE_DIRECTORIES:
@@ -30,6 +35,8 @@ def log_iteration_activity(messages, message_content):
     timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     log_entry = f'{timestamp} - {message_content}'
     messages.append({'role': 'assistant', 'content': log_entry})
+
+
 def log_new_messages(messages, log_file_path, last_read_position_file):
     try:
         with open(last_read_position_file, 'r') as file:
@@ -65,8 +72,7 @@ def read_file(filepath):
 
 def get_task():
     return read_file(
-        '/Users/dylan/Documents/GitHub/llm_project/self_improvement/task.txt'
-    )
+        '/Users/dylan/Documents/GitHub/llm_project/self_improvement/task.txt')
 
 
 def get_target_file():
@@ -235,10 +241,15 @@ def parse_AI_response_and_update(response, file):
                     update_code(function_definition, file)
                 return True
     return False
+
+
 def next_iteration(logs, file):
     log_iteration_activity(logs, 'Starting new iteration.')
     requester = LLMRequester()
-    formatted_logs = [{'role': log['role'], 'content': log['content']} for log in logs]
+    formatted_logs = [{
+        'role': log['role'],
+        'content': log['content']
+    } for log in logs]
     response = requester.request('gpt4', formatted_logs)
     log_iteration_activity(logs, f'AI response: {response}')
     parsed_response = parse_AI_response_and_update(response, file)
@@ -247,6 +258,8 @@ def next_iteration(logs, file):
     else:
         log_iteration_activity(logs, 'Code blocks parsed and updated.')
     return {'role': 'assistant', 'content': response}
+
+
 def main():
     print("self_improvement loop started!")
     messages = ["temp"]

@@ -5,14 +5,19 @@ import sys
 import shutil
 import unittest
 
-PROJECT_DIRECTORY = next((p for p in os.path.abspath(__file__).split(os.sep) if 'llm_project' in p), None)
+PROJECT_DIRECTORY = os.sep.join(
+    os.path.abspath(__file__).split(os.sep)
+    [:next((i for i, p in enumerate(os.path.abspath(__file__).split(os.sep))
+            if 'llm_project' in p), None) +
+     1]) if 'llm_project' in os.path.abspath(__file__) else None + "/"
+print(PROJECT_DIRECTORY)
 MODULE_DIRECTORIES = [
     "main", "llm_requests", "enviroment_setup_and_run", "running_tests",
     "logging"
 ]
 
 for directory in MODULE_DIRECTORIES:
-    sys.path.append(PROJECT_DIRECTORY + directory)
+    sys.path.append(os.path.join(PROJECT_DIRECTORY, directory))
 
 from task_manager import TaskManager
 from setup_and_run import EnvironmentManager

@@ -5568,5 +5568,19 @@
         "tokens": 4000,
         "timestamp": "2023-12-08 09:10:00",
         "response": "```python\ndef is_palindrome(s: str) -> bool:\n    # Normalize the string by removing spaces, converting to lowercase, and removing non-alphanumeric characters\n    normalized_str = ''.join(char for char in s if char.isalnum()).lower()\n    # Check if the normalized string is equal to its reverse\n    return normalized_str == normalized_str[::-1]\n```"
+    },
+    {
+        "model": "gpt3",
+        "messages": "Hello, how are you?",
+        "tokens": 4000,
+        "timestamp": "2023-12-08 16:57:44",
+        "response": "Hello! I'm just a virtual assistant, so I don't have feelings, but I'm here and ready to help you with anything you need. How can I assist you today?"
+    },
+    {
+        "model": "gpt4",
+        "messages": "Hello, how are you?",
+        "tokens": 4000,
+        "timestamp": "2023-12-08 16:57:46",
+        "response": "Hello! I'm just an artificial intelligence here to assist you. I don't have feelings, but I'm programmed to be helpful and informative. How can I assist you today?"
     }
 ]

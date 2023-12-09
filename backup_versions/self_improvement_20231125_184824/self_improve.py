@@ -5,7 +5,12 @@ import re
 import ast
 import shutil
 
-PROJECT_DIRECTORY = next((p for p in os.path.abspath(__file__).split(os.sep) if 'llm_project' in p), None)
+PROJECT_DIRECTORY = os.sep.join(
+    os.path.abspath(__file__).split(os.sep)
+    [:next((i for i, p in enumerate(os.path.abspath(__file__).split(os.sep))
+            if 'llm_project' in p), None) +
+     1]) if 'llm_project' in os.path.abspath(__file__) else None
+
 MODULE_DIRECTORIES = ["llm_requests", "running_tests"]
 
 for directory in MODULE_DIRECTORIES:
@@ -49,8 +54,7 @@ def read_file(filepath):
 
 def get_task():
     return read_file(
-        '/Users/dylan/Documents/GitHub/llm_project/self_improvement/task.txt'
-    )
+        '/Users/dylan/Documents/GitHub/llm_project/self_improvement/task.txt')
 
 
 def get_target_file():
@@ -126,13 +130,16 @@ def update_code(func, target_file):
                 else:
                     insert_index = 0
                     for (i, line) in enumerate(data):
-                        if line.startswith('import ') or line.startswith('from '):
+                        if line.startswith('import ') or line.startswith(
+                                'from '):
                             insert_index = i + 1
                     data.insert(insert_index, '\n' + func + '\n')
                 with open(target_file, 'w') as file:
                     file.writelines(data)
     except Exception as e:
         print(f'An error occurred while updating the code: {str(e)}')
+
+
 def get_current_code(
     filepath='/Users/dylan/Documents/GitHub/llm_project/self_improvement/self_improve.py'
 ):

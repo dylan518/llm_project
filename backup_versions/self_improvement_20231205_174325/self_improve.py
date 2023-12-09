@@ -5,7 +5,12 @@ import re
 import ast
 import shutil
 
-PROJECT_DIRECTORY = next((p for p in os.path.abspath(__file__).split(os.sep) if 'llm_project' in p), None)
+PROJECT_DIRECTORY = os.sep.join(
+    os.path.abspath(__file__).split(os.sep)
+    [:next((i for i, p in enumerate(os.path.abspath(__file__).split(os.sep))
+            if 'llm_project' in p), None) +
+     1]) if 'llm_project' in os.path.abspath(__file__) else None
+
 MODULE_DIRECTORIES = ["llm_requests", "running_tests"]
 
 for directory in MODULE_DIRECTORIES:
@@ -14,13 +19,17 @@ for directory in MODULE_DIRECTORIES:
 
 from llm_request import LLMRequester
 
+
 def collect_and_append_logs(messages, error_message):
     """
     Collects all relevant messages along with error messages and appends
     them into the messages list for a given loop iteration.
     """
     if error_message:
-        messages.append({'role': 'system', 'content': f'Error: {error_message}'})
+        messages.append({
+            'role': 'system',
+            'content': f'Error: {error_message}'
+        })
     log_iteration_activity(messages, 'All logs collected for this iteration.')
 
 
@@ -34,7 +43,10 @@ def eval_python_code(code):
         return False
 
 
-def log_iteration_activity(messages, message_content, current_iteration=None, total_iterations=None):
+def log_iteration_activity(messages,
+                           message_content,
+                           current_iteration=None,
+                           total_iterations=None):
     import datetime
     timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     iteration_info = ''
@@ -45,6 +57,8 @@ def log_iteration_activity(messages, message_content, current_iteration=None, to
     messages.append({'role': 'system', 'content': log_entry.strip()})
     with open(log_file_path, 'a') as log_file:
         log_file.write(log_entry)
+
+
 def log_new_messages(messages, log_file_path, last_read_position_file):
     try:
         with open(last_read_position_file, 'r') as file:
@@ -82,8 +96,7 @@ def read_file(filepath):
 
 def get_task():
     return read_file(
-        '/Users/dylan/Documents/GitHub/llm_project/self_improvement/task.txt'
-    )
+        '/Users/dylan/Documents/GitHub/llm_project/self_improvement/task.txt')
 
 
 def get_target_file():

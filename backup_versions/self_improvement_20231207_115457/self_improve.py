@@ -5,7 +5,12 @@ import re
 import ast
 import shutil
 
-PROJECT_DIRECTORY = next((p for p in os.path.abspath(__file__).split(os.sep) if 'llm_project' in p), None)
+PROJECT_DIRECTORY = os.sep.join(
+    os.path.abspath(__file__).split(os.sep)
+    [:next((i for i, p in enumerate(os.path.abspath(__file__).split(os.sep))
+            if 'llm_project' in p), None) +
+     1]) if 'llm_project' in os.path.abspath(__file__) else None
+
 MODULE_DIRECTORIES = ["llm_requests", "running_tests"]
 
 for directory in MODULE_DIRECTORIES:
@@ -115,8 +120,7 @@ def read_file(filepath):
 
 def get_task():
     return read_file(
-        '/Users/dylan/Documents/GitHub/llm_project/self_improvement/task.txt'
-    )
+        '/Users/dylan/Documents/GitHub/llm_project/self_improvement/task.txt')
 
 
 def get_target_file():
@@ -124,10 +128,10 @@ def get_target_file():
         '/Users/dylan/Documents/GitHub/llm_project/self_improvement/target_file.txt'
     )
 
+
 def get_usage():
     return read_file(
-        '/Users/dylan/Documents/GitHub/llm_project/self_improvement/usage.txt'
-    )
+        '/Users/dylan/Documents/GitHub/llm_project/self_improvement/usage.txt')
 
 
 #extracts python code from gpt output
@@ -350,7 +354,7 @@ def main():
         try:
             target_file = get_target_file()
 
-            task = get_task() + get_usage()+ "\n code: \n" + get_current_code(
+            task = get_task() + get_usage() + "\n code: \n" + get_current_code(
                 target_file)
             messages.append({'role': 'system', 'content': task})
             iteration_result = next_iteration(messages, target_file)
@@ -361,5 +365,6 @@ def main():
                                    f"An error occurred: {error_message}",
                                    current_iteration=i + 1,
                                    total_iterations=iterations)
+
 
 main()

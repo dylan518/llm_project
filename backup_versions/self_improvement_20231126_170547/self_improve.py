@@ -5,7 +5,12 @@ import re
 import ast
 import shutil
 
-PROJECT_DIRECTORY = next((p for p in os.path.abspath(__file__).split(os.sep) if 'llm_project' in p), None)
+PROJECT_DIRECTORY = os.sep.join(
+    os.path.abspath(__file__).split(os.sep)
+    [:next((i for i, p in enumerate(os.path.abspath(__file__).split(os.sep))
+            if 'llm_project' in p), None) +
+     1]) if 'llm_project' in os.path.abspath(__file__) else None
+
 MODULE_DIRECTORIES = ["llm_requests", "running_tests"]
 
 for directory in MODULE_DIRECTORIES:
@@ -68,8 +73,7 @@ def read_file(filepath):
 
 def get_task():
     return read_file(
-        '/Users/dylan/Documents/GitHub/llm_project/self_improvement/task.txt'
-    )
+        '/Users/dylan/Documents/GitHub/llm_project/self_improvement/task.txt')
 
 
 def get_target_file():
@@ -136,30 +140,44 @@ def update_code(func, target_file):
                     existing_func_snippet = ''.join(data[func_start:func_end])
                     snippet_length = len(existing_func_snippet)
                     if snippet_length > 20:
-                        existing_func_snippet_start = existing_func_snippet[:10]
+                        existing_func_snippet_start = existing_func_snippet[:
+                                                                            10]
                         existing_func_snippet_end = existing_func_snippet[-10:]
-                        log_iteration_activity([], f'Replacing function: {existing_func_snippet_start}...{existing_func_snippet_end}')
+                        log_iteration_activity(
+                            [],
+                            f'Replacing function: {existing_func_snippet_start}...{existing_func_snippet_end}'
+                        )
                     else:
-                        log_iteration_activity([], f'Replacing function: {existing_func_snippet}')
+                        log_iteration_activity(
+                            [], f'Replacing function: {existing_func_snippet}')
                     data[func_start:func_end] = [func + '\n']
                 else:
                     snippet_length = len(func)
                     if snippet_length > 20:
-                        log_iteration_activity([], f'Adding new function: {func[:10]}...{func[-10:]}')
+                        log_iteration_activity(
+                            [],
+                            f'Adding new function: {func[:10]}...{func[-10:]}')
                     else:
-                        log_iteration_activity([], f'Adding new function: {func}')
+                        log_iteration_activity([],
+                                               f'Adding new function: {func}')
                     insert_index = 0
                     for (i, line) in enumerate(data):
-                        if line.startswith('import ') or line.startswith('from '):
+                        if line.startswith('import ') or line.startswith(
+                                'from '):
                             insert_index = i + 1
                     data.insert(insert_index, '\n' + func + '\n')
                 new_func_snippet_start = func[:10]
                 new_func_snippet_end = func[-10:]
-                log_iteration_activity([], f'New/Updated function: {new_func_snippet_start}...{new_func_snippet_end}')
+                log_iteration_activity(
+                    [],
+                    f'New/Updated function: {new_func_snippet_start}...{new_func_snippet_end}'
+                )
                 with open(target_file, 'w') as file:
                     file.writelines(data)
     except Exception as e:
         print(f'An error occurred while updating the code: {str(e)}')
+
+
 def get_current_code(
     filepath='/Users/dylan/Documents/GitHub/llm_project/self_improvement/self_improve.py'
 ):

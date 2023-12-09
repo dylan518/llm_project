@@ -9,9 +9,14 @@ import pathlib
 class EnvironmentManager:
 
     def __init__(self):
-        self.PROJECT_DIRECTORY = next(
-            (p for p in pathlib.Path(__file__).resolve().parents
-             if p.name == 'llm_project'), None)  # Dynamic project directory
+        self.PROJECT_DIRECTORY = os.sep.join(
+            os.path.abspath(__file__).split(os.sep)
+            [:next((
+                i
+                for i, p in enumerate(os.path.abspath(__file__).split(os.sep))
+                if 'llm_project' in p), None) +
+             1]) if 'llm_project' in os.path.abspath(
+                 __file__) else None  # Dynamic project directory
         self.ENV_NAME = os.path.join(self.PROJECT_DIRECTORY,
                                      "enviroment_setup_and_run", "myenv")
         self.REQUIREMENTS_FILE = os.path.join(self.PROJECT_DIRECTORY,

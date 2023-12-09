@@ -5,7 +5,12 @@ import re
 import ast
 import shutil
 
-PROJECT_DIRECTORY = next((p for p in os.path.abspath(__file__).split(os.sep) if 'llm_project' in p), None)
+PROJECT_DIRECTORY = os.sep.join(
+    os.path.abspath(__file__).split(os.sep)
+    [:next((i for i, p in enumerate(os.path.abspath(__file__).split(os.sep))
+            if 'llm_project' in p), None) +
+     1]) if 'llm_project' in os.path.abspath(__file__) else None
+
 MODULE_DIRECTORIES = ["llm_requests", "running_tests"]
 
 for directory in MODULE_DIRECTORIES:
@@ -26,8 +31,7 @@ def read_file(filepath):
 
 def get_task():
     return read_file(
-        '/Users/dylan/Documents/GitHub/llm_project/self_improvement/task.txt'
-    )
+        '/Users/dylan/Documents/GitHub/llm_project/self_improvement/task.txt')
 
 
 def get_target_file():
@@ -234,15 +238,12 @@ Existing functions will be replaced, and new ones added. This is the code of the
 main()
 
 
-
 def check_syntax(code):
     try:
         compile(code, '<string>', 'exec')
         return True
     except SyntaxError:
         return False
-
-
 
 
 def log_error(error_message):
@@ -252,6 +253,9 @@ def log_error(error_message):
 
 
 def log_message(messages, new_message):
-    if not isinstance(new_message, dict) or 'role' not in new_message or 'content' not in new_message:
-        raise ValueError("new_message must be a dictionary with 'role' and 'content' keys")
+    if not isinstance(
+            new_message,
+            dict) or 'role' not in new_message or 'content' not in new_message:
+        raise ValueError(
+            "new_message must be a dictionary with 'role' and 'content' keys")
     messages.append(new_message)

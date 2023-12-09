@@ -6,9 +6,14 @@ import sys
 import tempfile
 import subprocess
 
-PROJECT_DIRECTORY = "/Users/dylan/Documents/GitHub/llm_project/"
+PROJECT_DIRECTORY = next(
+    (p for p in os.path.abspath(__file__).split(os.sep) if 'llm_project' in p),
+    None)
 MODULE_DIRECTORIES = [
-    "main", "llm_requests", "enviroment_setup_and_run", "running_tests",
+    "main",
+    "llm_requests",
+    "enviroment_setup_and_run",
+    "running_tests",
 ]
 for directory in MODULE_DIRECTORIES:
     sys.path.append(PROJECT_DIRECTORY + directory)
@@ -20,7 +25,7 @@ from setup_and_run import EnvironmentManager
 class TestValidator:
 
     def __init__(self):
-        self.PROJECT_DIRECTORY = "/Users/dylan/Documents/GitHub/llm_project/"
+        self.PROJECT_DIRECTORY = next((p for p in os.path.abspath(__file__).split(os.sep) if 'llm_project' in p), None)
         self.LOG_DIR = self.PROJECT_DIRECTORY + "logs"
         self.backup_manager = BackupManager()
         self.backup_path = self.backup_manager.BACKUP_DIR

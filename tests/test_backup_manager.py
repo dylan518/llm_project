@@ -5,7 +5,12 @@ import sys
 from unittest.mock import MagicMock, patch
 import shutil  # Import shutil for rmtree
 
-PROJECT_DIRECTORY = "/Users/dylan/Documents/GitHub/llm_project/"
+PROJECT_DIRECTORY = os.sep.join(
+    os.path.abspath(__file__).split(os.sep)
+    [:next((i for i, p in enumerate(os.path.abspath(__file__).split(os.sep))
+            if 'llm_project' in p), None) +
+     1]) if 'llm_project' in os.path.abspath(__file__) else None
+print(PROJECT_DIRECTORY)
 MODULE_DIRECTORIES = ["enviroment_setup_and_run", "running_tests", "logging"]
 
 for directory in MODULE_DIRECTORIES:

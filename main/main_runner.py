@@ -3,7 +3,9 @@ import unittest
 import sys
 import shutil  # Import shutil for rmtree
 
-PROJECT_DIRECTORY = "/Users/dylan/Documents/GitHub/llm_project/"
+PROJECT_DIRECTORY = PROJECT_DIRECTORY = next(
+    (p for p in os.path.abspath(__file__).split(os.sep) if 'llm_project' in p),
+    None)
 MODULE_DIRECTORIES = ["enviroment_setup_and_run", "running_tests", "logging"]
 
 for directory in MODULE_DIRECTORIES:
@@ -26,7 +28,9 @@ class Main:
         self.env_manager = EnvironmentManager()
         self.test_validator = TestValidator()
         self.back_up_dir = self.backup_manager.BACKUP_DIR
-        self.PROJECT_DIRECTORY = "/Users/dylan/Documents/GitHub/llm_project"
+        self.PROJECT_DIRECTORY = next(
+            (p for p in os.path.abspath(__file__).split(os.sep)
+             if 'llm_project' in p), None)
         print(self.back_up_dir)
 
     def run(self):

@@ -3,19 +3,17 @@ import subprocess
 import sys
 import multiprocessing
 import platform
-
-
-import os
-import subprocess
-import sys
-import multiprocessing
+import pathlib
 
 
 class EnvironmentManager:
 
     def __init__(self):
-        self.PROJECT_DIRECTORY = "/Users/dylan/Documents/GitHub/llm_project/"   # Dynamic project directory
-        self.ENV_NAME = os.path.join(self.PROJECT_DIRECTORY, "enviroment_setup_and_run","myenv")
+        self.PROJECT_DIRECTORY = next(
+            (p for p in pathlib.Path(__file__).resolve().parents
+             if p.name == 'llm_project'), None)  # Dynamic project directory
+        self.ENV_NAME = os.path.join(self.PROJECT_DIRECTORY,
+                                     "enviroment_setup_and_run", "myenv")
         self.REQUIREMENTS_FILE = os.path.join(self.PROJECT_DIRECTORY,
                                               "enviroment_setup_and_run",
                                               "requirements.txt")
@@ -25,34 +23,40 @@ class EnvironmentManager:
         self.outputs = {}
         self.venv_python = self.get_venv_python_path()
 
-
     def create_virtual_env(self):
         if os.path.exists(self.ENV_NAME):
             print(f"Virtual environment already exists at {self.ENV_NAME}.")
         else:
-            print(f"Creating virtual environment at {self.ENV_NAME} with Python: {sys.executable}")
+            print(
+                f"Creating virtual environment at {self.ENV_NAME} with Python: {sys.executable}"
+            )
             try:
-                subprocess.check_call([sys.executable, "-m", "venv", self.ENV_NAME])
+                subprocess.check_call(
+                    [sys.executable, "-m", "venv", self.ENV_NAME])
                 print("Virtual environment created successfully.")
             except subprocess.SubprocessError as e:
                 print(f"Failed to create virtual environment. Error: {e}")
                 return False
         return True
-    
+
     def run_script(self, script_name, time_limit=None, request_limit=None):
         if request_limit:
             self.set_request_limit(request_limit)
         script_path = os.path.join(self.PROJECT_DIRECTORY, script_name)
         command = f"{self.venv_python} {script_path}"
         try:
-            result = subprocess.run(command, shell=True, timeout=time_limit, capture_output=True, text=True)
+            result = subprocess.run(command,
+                                    shell=True,
+                                    timeout=time_limit,
+                                    capture_output=True,
+                                    text=True)
             self.outputs[script_name] = result.stdout
             print(result)
         except subprocess.TimeoutExpired:
             print(f"Terminating {script_name} due to time limit.")
         except Exception as e:
             print(f"Error running {script_name}: {e}")
-    
+
     def get_venv_python_path(self):
         if "Windows" in str(platform.system()):
             return os.path.join(self.ENV_NAME, 'Scripts', 'python.exe')
@@ -92,7 +96,7 @@ class EnvironmentManager:
             return set(line.strip().lower() for line in f)
 
     def install_missing_packages(self, missing_packages):
-        venv_python =self.get_venv_python_path()
+        venv_python = self.get_venv_python_path()
         try:
             self.upgrade_pip()
         except:
@@ -113,9 +117,6 @@ class EnvironmentManager:
             command = f"{venv_python} -c \"{python_code}\""
             # Use run_command to execute each import
             self.run_command(command)
-
-
-
 
     def create_virtual_env(self):
         if not os.path.exists(self.ENV_NAME):

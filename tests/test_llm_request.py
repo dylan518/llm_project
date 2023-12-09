@@ -3,7 +3,7 @@ import os
 import sys
 
 # Add local modules to path
-PROJECT_DIRECTORY = "/Users/dylan/Documents/GitHub/llm_project/"
+PROJECT_DIRECTORY = next((p for p in os.path.abspath(__file__).split(os.sep) if 'llm_project' in p), None)
 MODULE_DIRECTORIES = ["llm_requests"]
 
 for directory in MODULE_DIRECTORIES:

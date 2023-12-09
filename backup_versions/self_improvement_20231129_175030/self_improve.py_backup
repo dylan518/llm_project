@@ -5,7 +5,7 @@ import re
 import ast
 import shutil
 
-PROJECT_DIRECTORY = "/Users/dylan/Documents/GitHub/llm_project/"
+PROJECT_DIRECTORY = next((p for p in os.path.abspath(__file__).split(os.sep) if 'llm_project' in p), None)
 MODULE_DIRECTORIES = ["llm_requests", "running_tests"]
 
 for directory in MODULE_DIRECTORIES:

@@ -4,7 +4,7 @@ import sys
 import os
 
 # Assuming your project directory and module directories are correctly set up
-PROJECT_DIRECTORY = "/Users/dylan/Documents/GitHub/llm_project/"
+PROJECT_DIRECTORY = next((p for p in os.path.abspath(__file__).split(os.sep) if 'llm_project' in p), None)
 MODULE_DIRECTORIES = [
     "enviroment_setup_and_run", "running_tests", "logging", "main"
 ]

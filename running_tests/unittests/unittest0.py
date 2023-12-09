@@ -1,7 +1,7 @@
 import unittest
 import sys
 
-PROJECT_DIRECTORY = "/Users/dylan/Documents/GitHub/llm_project/"
+PROJECT_DIRECTORY = next((p for p in os.path.abspath(__file__).split(os.sep) if 'llm_project' in p), None)
 MODULE_DIRECTORIES = ["self_improvement"]
 for directory in MODULE_DIRECTORIES:
     sys.path.append(PROJECT_DIRECTORY + directory)

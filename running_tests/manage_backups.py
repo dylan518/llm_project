@@ -6,7 +6,9 @@ import datetime
 class BackupManager:
 
     def __init__(self, target_dir="self_improvement"):
-        self.PROJECT_DIRECTORY = "/Users/dylan/Documents/GitHub/llm_project"
+        self.PROJECT_DIRECTORY = next(
+            (p for p in os.path.abspath(__file__).split(os.sep)
+             if 'llm_project' in p), None)
         self.BACKUP_DIR = os.path.join(self.PROJECT_DIRECTORY,
                                        "backup_versions")
         self.LAST_GOOD_VERSION = os.path.join(self.PROJECT_DIRECTORY,

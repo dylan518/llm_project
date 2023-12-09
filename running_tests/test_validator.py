@@ -28,9 +28,13 @@ from setup_and_run import EnvironmentManager
 class TestValidator:
 
     def __init__(self):
-        self.PROJECT_DIRECTORY = next(
-            (p for p in os.path.abspath(__file__).split(os.sep)
-             if 'llm_project' in p), None)
+        self.PROJECT_DIRECTORY = os.sep.join(
+            os.path.abspath(__file__).split(os.sep)
+            [:next((
+                i
+                for i, p in enumerate(os.path.abspath(__file__).split(os.sep))
+                if 'llm_project' in p), None) +
+             1]) if 'llm_project' in os.path.abspath(__file__) else None
         self.LOG_DIR = self.PROJECT_DIRECTORY + "logs"
         self.backup_manager = BackupManager()
         self.backup_path = self.backup_manager.BACKUP_DIR

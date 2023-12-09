@@ -29,6 +29,13 @@ class TestTaskManager(unittest.TestCase):
     def setUp(self):
         """Set up testing environment before each test."""
         self.manager = TaskManager()
+        self.PROJECT_DIRECTORY = os.sep.join(
+            os.path.abspath(__file__).split(os.sep)
+            [:next((
+                i
+                for i, p in enumerate(os.path.abspath(__file__).split(os.sep))
+                if 'llm_project' in p), None) +
+             1]) if 'llm_project' in os.path.abspath(__file__) else None
 
     def test_load_task(self):
         """Test the load_task method."""
@@ -55,7 +62,8 @@ class TestTaskManager(unittest.TestCase):
 
     def test_set_target_file(self):
         target = "target.py"
-        expected_file_path = '/Users/dylan/Documents/GitHub/llm_project/self_improvement/target_file.txt'
+        expected_file_path = os.path.join(self.PROJECT_DIRECTORY,
+                                          'self_improvement/target_file.txt')
         with patch("builtins.open", mock_open()) as mock_file:
             self.manager.set_target_file(target)
             mock_file.assert_called_once_with(expected_file_path, 'w')

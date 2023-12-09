@@ -6,9 +6,14 @@ import datetime
 class BackupManager:
 
     def __init__(self, target_dir="self_improvement"):
-        self.PROJECT_DIRECTORY = next(
-            (p for p in os.path.abspath(__file__).split(os.sep)
-             if 'llm_project' in p), None)
+        self.PROJECT_DIRECTORY = os.sep.join(
+            os.path.abspath(__file__).split(os.sep)
+            [:next((
+                i
+                for i, p in enumerate(os.path.abspath(__file__).split(os.sep))
+                if 'llm_project' in p), None) +
+             1]) if 'llm_project' in os.path.abspath(__file__) else None
+
         self.BACKUP_DIR = os.path.join(self.PROJECT_DIRECTORY,
                                        "backup_versions")
         self.LAST_GOOD_VERSION = os.path.join(self.PROJECT_DIRECTORY,

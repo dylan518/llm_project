@@ -9,7 +9,9 @@ PROJECT_DIRECTORY = PROJECT_DIRECTORY = os.sep.join(
             if 'llm_project' in p), None) +
      1]) if 'llm_project' in os.path.abspath(__file__) else None
 
-MODULE_DIRECTORIES = ["enviroment_setup_and_run", "running_tests", "logging"]
+MODULE_DIRECTORIES = [
+    "enviroment_setup_and_run", "running_tests", "llm_requests"
+]
 
 for directory in MODULE_DIRECTORIES:
     sys.path.append(os.path.join(PROJECT_DIRECTORY,
@@ -18,7 +20,6 @@ for directory in MODULE_DIRECTORIES:
 from manage_backups import BackupManager
 from test_validator import TestValidator
 from manage_backups import BackupManager
-from llm_request import LLMRequester
 from task_manager import TaskManager
 from setup_and_run import EnvironmentManager
 
@@ -31,9 +32,14 @@ class Main:
         self.env_manager = EnvironmentManager()
         self.test_validator = TestValidator()
         self.back_up_dir = self.backup_manager.BACKUP_DIR
-        self.PROJECT_DIRECTORY = next(
-            (p for p in os.path.abspath(__file__).split(os.sep)
-             if 'llm_project' in p), None)
+        self.PROJECT_DIRECTORY = os.sep.join(
+            os.path.abspath(__file__).split(os.sep)
+            [:next((
+                i
+                for i, p in enumerate(os.path.abspath(__file__).split(os.sep))
+                if 'llm_project' in p), None) +
+             1]) if 'llm_project' in os.path.abspath(__file__) else None
+
         print(self.back_up_dir)
 
     def run(self):

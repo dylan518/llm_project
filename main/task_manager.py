@@ -9,7 +9,7 @@ PROJECT_DIRECTORY = os.sep.join(
 
 MODULE_DIRECTORIES = ["enviroment_setup_and_run"]
 for directory in MODULE_DIRECTORIES:
-    sys.path.append(PROJECT_DIRECTORY + directory)
+    sys.path.append(os.path.join(PROJECT_DIRECTORY, directory))
 from setup_and_run import EnvironmentManager
 
 
@@ -19,9 +19,13 @@ class TaskManager:
                  task_file_path="/self_improvement/task.txt",
                  target_file_path="/self_improvement/self_improve.py",
                  target_text="/self_improvement/target_file.txt"):
-        self.PROJECT_DIRECTORY = next(
-            (p for p in os.path.abspath(__file__).split(os.sep)
-             if 'llm_project' in p), None)
+        self.PROJECT_DIRECTORY = os.sep.join(
+            os.path.abspath(__file__).split(os.sep)
+            [:next((
+                i
+                for i, p in enumerate(os.path.abspath(__file__).split(os.sep))
+                if 'llm_project' in p), None) +
+             1]) if 'llm_project' in os.path.abspath(__file__) else None
         self.task_file_path = self.PROJECT_DIRECTORY + task_file_path
         self.target_file_path = self.PROJECT_DIRECTORY + target_file_path
         self.target_text = self.PROJECT_DIRECTORY + target_text

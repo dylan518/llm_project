@@ -75,9 +75,8 @@ def log_iteration_activity(messages,
     if current_iteration is not None and total_iterations is not None:
         iteration_info = f'Iteration {current_iteration} of {total_iterations} - '
     log_entry = f'[{log_category.upper()}] {timestamp} - {iteration_info}{message_content}\n'
-    print(os.environ.get('PROJECT_DIRECTORY'))
     log_file_path = os.path.join(os.environ.get('PROJECT_DIRECTORY'),
-                                 'self_improvement/log_file.log')
+                                 '/self_improvement/log_file.log')
     messages.append({
         'role': 'system',
         'content': log_entry.strip(),
@@ -106,7 +105,7 @@ def log_new_messages(messages, log_file_path, last_read_position_file):
 
 def append_new_log_messages(messages):
     log_file_path = os.path.join(os.environ.get('PROJECT_DIRECTORY'),
-                                 'self_improvement/log_file.log')
+                                 '/self_improvement/log_file.log')
     with open(log_file_path, 'r') as file:
         new_messages = file.readlines()
     for message in new_messages:
@@ -126,19 +125,19 @@ def read_file(filepath):
 def get_task():
     return read_file(
         os.path.join(os.environ.get('PROJECT_DIRECTORY'),
-                     'self_improvement/task.txt'))
+                     '/self_improvement/task.txt'))
 
 
 def get_target_file():
     return read_file(
         os.path.join(os.environ.get('PROJECT_DIRECTORY'),
-                     'self_improvement/target_file.txt'))
+                     '/self_improvement/target_file.txt'))
 
 
 def get_usage():
     return read_file(
         os.path.join(os.environ.get('PROJECT_DIRECTORY'),
-                     'self_improvement/usage.txt'))
+                     '/self_improvement/usage.txt'))
 
 
 #extracts python code from gpt output
@@ -264,7 +263,7 @@ def backup_code():
     filepath -- str: a string that contains the name of the file we want to backup.
     """
     filepath = os.path.join(os.environ.get('PROJECT_DIRECTORY'),
-                            'self_improvement/self_improve.py')
+                            '/self_improvement/self_improve.py')
     backup_path = filepath + '_backup'
     shutil.copy2(filepath, backup_path)
     print(f'Backup of {filepath} created at {backup_path}')

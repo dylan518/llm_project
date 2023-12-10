@@ -20,7 +20,8 @@ for directory in MODULE_DIRECTORIES:
 
 from llm_request import LLMRequester
 
-def refined_collect_logs(log_file_path, logs_start_token):
+
+def collect_logs(log_file_path, logs_start_token):
     """
     Collects logs from the specified log file, only including logs after the given start token, with improved error handling.
     
@@ -31,48 +32,29 @@ def refined_collect_logs(log_file_path, logs_start_token):
     Returns:
     - list: A list of strings containing the logs of interest or an error message if logs_start_token not found.
     """
-    collected_logs = []
-    found_token = False
-    with open(log_file_path, 'r') as log_file:
-        log_file.seek(0, os.SEEK_END)
-        while log_file.tell() > 0:
-            log_file.seek(log_file.tell() - 1, os.SEEK_SET)
-            if log_file.read(1) == '\n':
-                line = log_file.readline().strip()
-                if logs_start_token in line:
-                    found_token = True
-                    break
-        if found_token:
-            log_file.seek(log_file.tell() - 1, os.SEEK_SET)
-            collected_logs.extend(log_file.readlines())
-        else:
+    try:
+        with open(log_file_path, 'r') as log_file:
+            logs = log_file.readlines()
+
+        # Find the line with the start token and collect all logs after it
+        collected_logs = []
+        token_found = False
+        for line in reversed(logs):
+            if logs_start_token in line:
+                token_found = True
+                break
+            collected_logs.append(line.strip())
+
+        if not token_found:
             return 'Error: logs_start_token not found. No logs collected.'
-    return [log.strip() for log in collected_logs if log.strip()]
+
+        # Reverse the collected logs to maintain chronological order
+        return list(reversed(collected_logs))
+
+    except IOError as e:
+        return f'Error: Unable to read the file - {e}'
 
 
-def collect_logs(log_file_path, logs_start_token):
-    """
-    Collects logs from the specified log file, only including logs after the given start token.
-    
-    Parameters:
-    - log_file_path (str): The path to the log file.
-    - logs_start_token (str): The token that marks the beginning of relevant logs.
-    
-    Returns:
-    - list: A list of strings containing the logs of interest.
-    """
-    collected_logs = []
-    with open(log_file_path, 'r') as log_file:
-        log_file.seek(0, os.SEEK_END)
-        while log_file.tell() > 0:
-            log_file.seek(log_file.tell() - 1, os.SEEK_SET)
-            if log_file.read(1) == '\n':
-                line = log_file.readline().strip()
-                if logs_start_token in line:
-                    break
-        log_file.seek(log_file.tell() - 1, os.SEEK_SET)
-        collected_logs.extend(log_file.readlines())
-    return [log.strip() for log in collected_logs if log.strip()]
 def eval_python_code(code):
     try:
         exec(code)
@@ -368,21 +350,33 @@ def next_iteration(logs, file):
 
 
 def main():
-    log_iteration_activity([], 'Self-improvement loop started!')
+    start_token = 'Self-improvement loop started!'
+    log_iteration_activity([], start_token)
     messages = []
     iterations = 3
     for i in range(iterations):
-        log_iteration_activity([], 'Starting iteration', current_iteration=i + 1, total_iterations=iterations)
+        log_iteration_activity([],
+                               'Starting iteration',
+                               current_iteration=i + 1,
+                               total_iterations=iterations)
         try:
-            logs_collected = collect_logs(os.path.join(os.environ.get('PROJECT_DIRECTORY'), 'self_improvement/log_file.log'), '===== Log Start =====')
+            logs_collected = collect_logs(
+                os.path.join(os.environ.get('PROJECT_DIRECTORY'),
+                             'self_improvement/log_file.log'), start_token)
             for log in logs_collected:
                 messages.append({'role': 'system', 'content': log})
             target_file = get_target_file()
-            task = get_task() + get_usage() + '\n code: \n' + get_current_code(target_file)
+            task = get_task() + get_usage() + '\n code: \n' + get_current_code(
+                target_file)
             messages.append({'role': 'system', 'content': task})
             iteration_result = next_iteration(messages, target_file)
             messages.append(iteration_result)
         except Exception as e:
             error_message = str(e)
-            log_iteration_activity([], f'An error occurred: {error_message}', current_iteration=i + 1, total_iterations=iterations)
+            log_iteration_activity([],
+                                   f'An error occurred: {error_message}',
+                                   current_iteration=i + 1,
+                                   total_iterations=iterations)
+
+
 main()

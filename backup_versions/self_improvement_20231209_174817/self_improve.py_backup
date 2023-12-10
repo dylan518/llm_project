@@ -32,27 +32,23 @@ def collect_logs(log_file_path, logs_start_token):
     Returns:
     - list: A list of strings containing the logs of interest or an error message if logs_start_token not found.
     """
-    try:
-        with open(log_file_path, 'r') as log_file:
-            logs = log_file.readlines()
-
-        # Find the line with the start token and collect all logs after it
-        collected_logs = []
-        token_found = False
-        for line in reversed(logs):
-            if logs_start_token in line:
-                token_found = True
-                break
-            collected_logs.append(line.strip())
-
-        if not token_found:
+    collected_logs = []
+    found_token = False
+    with open(log_file_path, 'r') as log_file:
+        log_file.seek(0, os.SEEK_END)
+        while log_file.tell() > 0:
+            log_file.seek(log_file.tell() - 1, os.SEEK_SET)
+            if log_file.read(1) == '\n':
+                line = log_file.readline().strip()
+                if logs_start_token in line:
+                    found_token = True
+                    break
+        if found_token:
+            log_file.seek(log_file.tell() - 1, os.SEEK_SET)
+            collected_logs.extend(log_file.readlines())
+        else:
             return 'Error: logs_start_token not found. No logs collected.'
-
-        # Reverse the collected logs to maintain chronological order
-        return list(reversed(collected_logs))
-
-    except IOError as e:
-        return f'Error: Unable to read the file - {e}'
+    return [log.strip() for log in collected_logs if log.strip()]
 
 
 def eval_python_code(code):

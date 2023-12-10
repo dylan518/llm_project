@@ -13,4 +13,4 @@ The main loop: Repeatedly requests feedback from GPT and applies code enhancemen
 Operational Note: At the end of each loop, the system undergoes a basic coding test. If it fails, the system will revert to its previous state. Ensure the script remains functional after each iteration.
 
 **temporary task:**
-Write a collect logs function so it collects the logs by parsing since loop started and make those the messages. You won't need the orginal messages as they are included in logs. Use system as role.
+Now implement the collecting of the messages in the main function so that the logs are added as gpt messages of type "system". Ensure the messages aren't added with the logs as the logs include the messages.

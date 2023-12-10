@@ -371,18 +371,25 @@ def main():
     log_iteration_activity([], 'Self-improvement loop started!')
     messages = []
     iterations = 3
-    for i in range(iterations):
-        log_iteration_activity([], 'Starting iteration', current_iteration=i + 1, total_iterations=iterations)
+    for i in range(iterations):  # Run the loop for n iterations
+        log_iteration_activity([],
+                               'Starting iteration',
+                               current_iteration=i + 1,
+                               total_iterations=iterations)
         try:
-            logs_collected = collect_logs(os.path.join(os.environ.get('PROJECT_DIRECTORY'), 'self_improvement/log_file.log'), '===== Log Start =====')
-            for log in logs_collected:
-                messages.append({'role': 'system', 'content': log})
             target_file = get_target_file()
-            task = get_task() + get_usage() + '\n code: \n' + get_current_code(target_file)
+
+            task = get_task() + get_usage() + "\n code: \n" + get_current_code(
+                target_file)
             messages.append({'role': 'system', 'content': task})
             iteration_result = next_iteration(messages, target_file)
             messages.append(iteration_result)
         except Exception as e:
-            error_message = str(e)
-            log_iteration_activity([], f'An error occurred: {error_message}', current_iteration=i + 1, total_iterations=iterations)
+            error_message = str(e)  # Get the error message as a string
+            log_iteration_activity([],
+                                   f"An error occurred: {error_message}",
+                                   current_iteration=i + 1,
+                                   total_iterations=iterations)
+
+
 main()

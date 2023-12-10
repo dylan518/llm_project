@@ -5,6 +5,7 @@ import traceback
 import sys
 import tempfile
 import subprocess
+import shutil
 
 PROJECT_DIRECTORY = os.sep.join(
     os.path.abspath(__file__).split(os.sep)
@@ -83,6 +84,8 @@ class TestValidator:
             result = subprocess.run([sys.executable, temp_file_path],
                                     capture_output=True,
                                     text=True)
+            #remove temporary directory
+            shutil.rmtree(temp_dir)
 
         except:
             print("error running test script")

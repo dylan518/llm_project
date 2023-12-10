@@ -2,7 +2,7 @@ TASK: Enhance the 'self_improve.py' script to enable it to autonomously refine i
 
 Strategic Planning: Methodically plan the progression of improvements. This involves identifying potential enhancements in the script and devising a roadmap for incremental development.
 Non-repetitive Progression: Ensure that each iteration of the script brings new improvements. Avoid suggesting or implementing the same changes in consecutive iterations.
-Functional Code Production: All code modifications and additions must be fully operational. Refrain from using placeholder comments for brevity or temporary file paths that are not executable.
+Functional Code Production: All code modifications and additions must be fully operational. Refrain from using placeholder comments for brevity or temporary file paths that are not executable. Also, ensure that functions you add are actually utilized.
 
 Code Overview: The 'self_improve.py' script operates in a self-enhancement loop, leveraging GPT for its own code optimization. Key functions include:
 
@@ -13,4 +13,4 @@ The main loop: Repeatedly requests feedback from GPT and applies code enhancemen
 Operational Note: At the end of each loop, the system undergoes a basic coding test. If it fails, the system will revert to its previous state. Ensure the script remains functional after each iteration.
 
 **temporary task:**
-Now implement the collecting of the messages in the main function so that the logs are added as gpt messages of type "system". Ensure the messages aren't added with the logs as the logs include the messages.
+Currently it splits the logs by line into messages. Instead have the messages break every time the [INFO] tag appears.

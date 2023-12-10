@@ -20,10 +20,87 @@ for directory in MODULE_DIRECTORIES:
 
 from llm_request import LLMRequester
 
+def perform_self_tests(test_script_path):
+    """
+    Executes a script that contains a series of self-tests to validate the functionality of the enhanced code.
+
+    Parameters:
+    - test_script_path (str): The path to the testing script.
+    
+    Returns:
+    - bool: True if all tests passed, False otherwise.
+    """
+    try:
+        result = subprocess.run(['python', test_script_path], capture_output=True, text=True)
+        if result.returncode == 0:
+            log_iteration_activity([], 'All self-tests passed successfully.')
+            return True
+        else:
+            log_iteration_activity([], f'Self-tests failed with message: {result.stderr}')
+            return False
+    except Exception as e:
+        log_iteration_activity([], f'Error during self-tests execution: {e}')
+        return False
+
+def integrate_improvement_plan(plan, plan_file_path):
+    """
+    This function outlines an improvement plan to guide the iteration of improvements. 
+    It retrieves, updates, or creates a plan for the progression of the code enhancement.
+
+    Parameters:
+    - plan (dict): A dictionary with a roadmap of planned enhancements.
+    - plan_file_path (str): The path to the file where the plan is stored or will be stored.
+    
+    Returns:
+    - dict: The updated plan with modifications or the same plan if no modifications were necessary.
+    """
+    try:
+        if os.path.exists(plan_file_path):
+            with open(plan_file_path, 'r') as plan_file:
+                existing_plan = json.load(plan_file)
+            existing_plan.update(plan)
+            with open(plan_file_path, 'w') as plan_file:
+                json.dump(existing_plan, plan_file)
+            return existing_plan
+        else:
+            with open(plan_file_path, 'w') as plan_file:
+                json.dump(plan, plan_file)
+            return plan
+    except json.JSONDecodeError as e:
+        log_iteration_activity([], f'JSON decode error in plan file: {e}')
+        return plan
+    except Exception as e:
+        log_iteration_activity([], f'Error integrating the improvement plan: {e}')
+        return plan
+
+def prioritize_tasks(task_file_path):
+    """
+    Prioritize the tasks listed in the tasks file. This helps the AI determine which improvements are more urgent or impactful.
+    
+    Parameters:
+    - task_file_path (str): The path to the tasks file.
+    
+    Returns:
+    - list: A prioritized list of tasks.
+    """
+    try:
+        with open(task_file_path, 'r') as task_file:
+            tasks = task_file.readlines()
+        prioritized_tasks = sorted(tasks, key=len, reverse=True)
+        return prioritized_tasks
+    except IOError as e:
+        log_iteration_activity([], f'Error reading tasks file: {e}')
+        return []
+    except Exception as e:
+        log_iteration_activity([], f'General error while prioritizing tasks: {e}')
+        return []
+
 
 def collect_logs(log_file_path, logs_start_token):
     """
     Collects logs from the specified log file, only including logs after the given start token, with improved error handling.
+    
+    The logs are split based on occurrences of the [INFO] tag instead of being split by lines to group log messages that belong together.
     
     Parameters:
     - log_file_path (str): The path to the log file.
@@ -34,27 +111,16 @@ def collect_logs(log_file_path, logs_start_token):
     """
     try:
         with open(log_file_path, 'r') as log_file:
-            logs = log_file.readlines()
-
-        # Find the line with the start token and collect all logs after it
-        collected_logs = []
-        token_found = False
-        for line in reversed(logs):
-            if logs_start_token in line:
-                token_found = True
-                break
-            collected_logs.append(line.strip())
-
-        if not token_found:
+            log_content = log_file.read()
+        relevant_logs = log_content.split(logs_start_token, 1)[-1]
+        if not relevant_logs:
             return 'Error: logs_start_token not found. No logs collected.'
-
-        # Reverse the collected logs to maintain chronological order
-        return list(reversed(collected_logs))
-
+        split_logs = re.split('(\\[INFO\\])', relevant_logs)
+        grouped_logs = [''.join(split_logs[i:i + 2]) for i in range(1, len(split_logs), 2)]
+        collected_logs = [log.strip() for log in grouped_logs if '[INFO]' in log]
+        return collected_logs
     except IOError as e:
         return f'Error: Unable to read the file - {e}'
-
-
 def eval_python_code(code):
     try:
         exec(code)
@@ -185,67 +251,42 @@ def extract_function_definitions(code):
 
 #updates code in self_improve.py
 def update_code(func, target_file):
+    """
+    Integrate the code suggestion from the AI response into the self_improve.py file.
+
+    Parameters:
+    - func (str): The function code to be added or updated in the target file.
+    - target_file (str): The path to the target file that needs to be updated.
+    """
     try:
         tree = ast.parse(func)
-        for node in tree.body:
-            if isinstance(node, ast.FunctionDef):
-                func_name = node.name
-                with open(target_file, 'r') as file:
-                    data = file.readlines()
-                func_start = None
-                func_end = None
-                indent_level = None
-                for (index, line) in enumerate(data):
-                    stripped = line.lstrip()
-                    indent = len(line) - len(stripped)
-                    if stripped.startswith(f'def {func_name}'):
-                        func_start = index
-                        indent_level = indent
-                    elif func_start is not None and indent <= indent_level and stripped:
-                        func_end = index
+        func_name = tree.body[0].name if tree.body else None
+        if not func_name:
+            return 'Error: No valid function name found in the provided code.'
+        with open(target_file, 'r') as file:
+            target_code_lines = file.readlines()
+        func_start_index = None
+        func_end_index = None
+        for (index, line) in enumerate(target_code_lines):
+            if line.strip().startswith('def ' + func_name):
+                func_start_index = index
+                for end_index in range(index + 1, len(target_code_lines)):
+                    if target_code_lines[end_index].strip() and (not target_code_lines[end_index].startswith('    ')):
+                        func_end_index = end_index
                         break
-                if func_start is not None:
-                    existing_func_snippet = ''.join(data[func_start:func_end])
-                    snippet_length = len(existing_func_snippet)
-                    if snippet_length > 20:
-                        existing_func_snippet_start = existing_func_snippet[:
-                                                                            10]
-                        existing_func_snippet_end = existing_func_snippet[-10:]
-                        log_iteration_activity(
-                            [],
-                            f'Replacing function: {existing_func_snippet_start}...{existing_func_snippet_end}'
-                        )
-                    else:
-                        log_iteration_activity(
-                            [], f'Replacing function: {existing_func_snippet}')
-                    data[func_start:func_end] = [func + '\n']
-                else:
-                    snippet_length = len(func)
-                    if snippet_length > 20:
-                        log_iteration_activity(
-                            [],
-                            f'Adding new function: {func[:10]}...{func[-10:]}')
-                    else:
-                        log_iteration_activity([],
-                                               f'Adding new function: {func}')
-                    insert_index = 0
-                    for (i, line) in enumerate(data):
-                        if line.startswith('import ') or line.startswith(
-                                'from '):
-                            insert_index = i + 1
-                    data.insert(insert_index, '\n' + func + '\n')
-                new_func_snippet_start = func[:10]
-                new_func_snippet_end = func[-10:]
-                log_iteration_activity(
-                    [],
-                    f'New/Updated function: {new_func_snippet_start}...{new_func_snippet_end}'
-                )
-                with open(target_file, 'w') as file:
-                    file.writelines(data)
+                if not func_end_index:
+                    func_end_index = len(target_code_lines)
+                break
+        if func_start_index is not None:
+            new_code = target_code_lines[:func_start_index] + [func] + target_code_lines[func_end_index:]
+            log_iteration_activity([], f'Updating existing function: {func_name}')
+        else:
+            new_code = target_code_lines + [func]
+            log_iteration_activity([], f'Adding new function: {func_name}')
+        with open(target_file, 'w') as file:
+            file.writelines(new_code)
     except Exception as e:
-        print(f'An error occurred while updating the code: {str(e)}')
-
-
+        return f'Error updating code: {e}'
 def get_current_code(filepath):
     try:
         with open(filepath, "r") as file:

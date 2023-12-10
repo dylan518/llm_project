@@ -70,9 +70,9 @@ class TestValidator:
         self.env_manager.setup_environment()
         self.print_file_contents(code_file)
         self.print_file_contents(test_file)
-        temp_dir = tempfile.mkdtemp(dir=self.PROJECT_DIRECTORY)
         try:
             # Create a temporary file
+            temp_dir = tempfile.mkdtemp(dir=self.PROJECT_DIRECTORY)
             temp_file_path = os.path.join(temp_dir, 'temp_test_file.py')
             with open(temp_file_path, 'w') as temp_file:
                 # Write the contents of code_file and test_file to temp_file
@@ -83,6 +83,7 @@ class TestValidator:
             result = subprocess.run([sys.executable, temp_file_path],
                                     capture_output=True,
                                     text=True)
+
         except:
             print("error running test script")
         # Log the results

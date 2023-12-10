@@ -4,7 +4,6 @@ import subprocess
 import re
 import ast
 import shutil
-import re
 
 PROJECT_DIRECTORY = os.sep.join(
     os.path.abspath(__file__).split(os.sep)
@@ -21,32 +20,107 @@ for directory in MODULE_DIRECTORIES:
 
 from llm_request import LLMRequester
 
+def perform_self_tests(test_script_path):
+    """
+    Executes a script that contains a series of self-tests to validate the functionality of the enhanced code.
+
+    Parameters:
+    - test_script_path (str): The path to the testing script.
+    
+    Returns:
+    - bool: True if all tests passed, False otherwise.
+    """
+    try:
+        result = subprocess.run(['python', test_script_path], capture_output=True, text=True)
+        if result.returncode == 0:
+            log_iteration_activity([], 'All self-tests passed successfully.')
+            return True
+        else:
+            log_iteration_activity([], f'Self-tests failed with message: {result.stderr}')
+            return False
+    except Exception as e:
+        log_iteration_activity([], f'Error during self-tests execution: {e}')
+        return False
+
+def integrate_improvement_plan(plan, plan_file_path):
+    """
+    This function outlines an improvement plan to guide the iteration of improvements. 
+    It retrieves, updates, or creates a plan for the progression of the code enhancement.
+
+    Parameters:
+    - plan (dict): A dictionary with a roadmap of planned enhancements.
+    - plan_file_path (str): The path to the file where the plan is stored or will be stored.
+    
+    Returns:
+    - dict: The updated plan with modifications or the same plan if no modifications were necessary.
+    """
+    try:
+        if os.path.exists(plan_file_path):
+            with open(plan_file_path, 'r') as plan_file:
+                existing_plan = json.load(plan_file)
+            existing_plan.update(plan)
+            with open(plan_file_path, 'w') as plan_file:
+                json.dump(existing_plan, plan_file)
+            return existing_plan
+        else:
+            with open(plan_file_path, 'w') as plan_file:
+                json.dump(plan, plan_file)
+            return plan
+    except json.JSONDecodeError as e:
+        log_iteration_activity([], f'JSON decode error in plan file: {e}')
+        return plan
+    except Exception as e:
+        log_iteration_activity([], f'Error integrating the improvement plan: {e}')
+        return plan
+
+def prioritize_tasks(task_file_path):
+    """
+    Prioritize the tasks listed in the tasks file. This helps the AI determine which improvements are more urgent or impactful.
+    
+    Parameters:
+    - task_file_path (str): The path to the tasks file.
+    
+    Returns:
+    - list: A prioritized list of tasks.
+    """
+    try:
+        with open(task_file_path, 'r') as task_file:
+            tasks = task_file.readlines()
+        prioritized_tasks = sorted(tasks, key=len, reverse=True)
+        return prioritized_tasks
+    except IOError as e:
+        log_iteration_activity([], f'Error reading tasks file: {e}')
+        return []
+    except Exception as e:
+        log_iteration_activity([], f'General error while prioritizing tasks: {e}')
+        return []
+
 
 def collect_logs(log_file_path, logs_start_token):
+    """
+    Collects logs from the specified log file, only including logs after the given start token, with improved error handling.
+    
+    The logs are split based on occurrences of the [INFO] tag instead of being split by lines to group log messages that belong together.
+    
+    Parameters:
+    - log_file_path (str): The path to the log file.
+    - logs_start_token (str): The token that marks the beginning of relevant logs.
+    
+    Returns:
+    - list: A list of strings containing the logs of interest or an error message if logs_start_token not found.
+    """
     try:
         with open(log_file_path, 'r') as log_file:
             log_content = log_file.read()
-
-        # Use regex to find the last occurrence of logs_start_token
-        matches = list(re.finditer(logs_start_token, log_content))
-        if not matches:
+        relevant_logs = log_content.split(logs_start_token, 1)[-1]
+        if not relevant_logs:
             return 'Error: logs_start_token not found. No logs collected.'
-
-        last_match = matches[-1]
-        relevant_logs = log_content[last_match.end():]
         split_logs = re.split('(\\[INFO\\])', relevant_logs)
-        grouped_logs = [
-            ''.join(split_logs[i:i + 2]) for i in range(1, len(split_logs), 2)
-        ]
-        collected_logs = [
-            log.strip() for log in grouped_logs if '[INFO]' in log
-        ]
+        grouped_logs = [''.join(split_logs[i:i + 2]) for i in range(1, len(split_logs), 2)]
+        collected_logs = [log.strip() for log in grouped_logs if '[INFO]' in log]
         return collected_logs
-
     except IOError as e:
         return f'Error: Unable to read the file - {e}'
-
-
 def eval_python_code(code):
     try:
         exec(code)
@@ -197,20 +271,15 @@ def update_code(func, target_file):
             if line.strip().startswith('def ' + func_name):
                 func_start_index = index
                 for end_index in range(index + 1, len(target_code_lines)):
-                    if target_code_lines[end_index].strip() and (
-                            not target_code_lines[end_index].startswith('    ')
-                    ):
+                    if target_code_lines[end_index].strip() and (not target_code_lines[end_index].startswith('    ')):
                         func_end_index = end_index
                         break
                 if not func_end_index:
                     func_end_index = len(target_code_lines)
                 break
         if func_start_index is not None:
-            new_code = target_code_lines[:func_start_index] + [
-                func
-            ] + target_code_lines[func_end_index:]
-            log_iteration_activity([],
-                                   f'Updating existing function: {func_name}')
+            new_code = target_code_lines[:func_start_index] + [func] + target_code_lines[func_end_index:]
+            log_iteration_activity([], f'Updating existing function: {func_name}')
         else:
             new_code = target_code_lines + [func]
             log_iteration_activity([], f'Adding new function: {func_name}')
@@ -218,8 +287,6 @@ def update_code(func, target_file):
             file.writelines(new_code)
     except Exception as e:
         return f'Error updating code: {e}'
-
-
 def get_current_code(filepath):
     try:
         with open(filepath, "r") as file:

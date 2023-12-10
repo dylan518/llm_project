@@ -13,4 +13,4 @@ The main loop: Repeatedly requests feedback from GPT and applies code enhancemen
 Operational Note: At the end of each loop, the system undergoes a basic coding test. If it fails, the system will revert to its previous state. Ensure the script remains functional after each iteration.
 
 **temporary task:**
-Currently it splits the logs by line into messages. Instead have the messages break every time the [INFO] tag appears.
+Have it safe the log as json file so it can easily be search in reverse. Have each loop be a list of log messages. Make sure the reading and logging is changed to this json format.

@@ -4,7 +4,6 @@ import subprocess
 import re
 import ast
 import shutil
-import re
 
 PROJECT_DIRECTORY = os.sep.join(
     os.path.abspath(__file__).split(os.sep)
@@ -27,13 +26,11 @@ def collect_logs(log_file_path, logs_start_token):
         with open(log_file_path, 'r') as log_file:
             log_content = log_file.read()
 
-        # Use regex to find the last occurrence of logs_start_token
-        matches = list(re.finditer(logs_start_token, log_content))
-        if not matches:
+        # Check if logs_start_token is present in the log_content
+        if logs_start_token not in log_content:
             return 'Error: logs_start_token not found. No logs collected.'
 
-        last_match = matches[-1]
-        relevant_logs = log_content[last_match.end():]
+        relevant_logs = log_content.split(logs_start_token, 1)[-1]
         split_logs = re.split('(\\[INFO\\])', relevant_logs)
         grouped_logs = [
             ''.join(split_logs[i:i + 2]) for i in range(1, len(split_logs), 2)

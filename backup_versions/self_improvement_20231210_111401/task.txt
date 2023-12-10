@@ -1,0 +1,11 @@
+Task: Palindrome Checker
+
+Your task is to develop a function that checks if a given string is a palindrome. A palindrome is a word, phrase, number, or other sequences of characters that reads the same forward and backward (ignoring spaces, punctuation, and capitalization).
+
+Specifications:
+
+Palindrome Checker:
+Write a function named is_palindrome(s: str) -> bool that takes in a string s and returns True if it's a palindrome and False otherwise.
+Constraints:
+The function should ignore spaces, punctuation, and capitalization when determining if a string is a palindrome.
+The function should be efficient and handle strings of varying lengths.

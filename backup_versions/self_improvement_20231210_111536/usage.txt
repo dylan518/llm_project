@@ -1,0 +1,9 @@
+**Usage Instructions:**
+To add python functions to the codefile generate Python functions in this format:
+
+```python
+def example_function():
+    print('This is a simple example function that prints out a message.')
+```
+ensure def is directly after python and that ```python and ``` are on their own lines. there should be nothing before or after the function. All imports will automatically be handled don't add imports.
+Existing functions will be replaced, and new ones added. This is the code of the target file.

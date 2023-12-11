@@ -1,0 +1,16 @@
+TASK: Enhance the 'self_improve.py' script to enable it to autonomously refine its functionality using tasks defined in 'tasks.txt'. The ultimate goal is to create a self-improving AI system. To achieve this, adhere to the following guidelines:
+
+Strategic Planning: In the first message create a plan that will describe the actions that should be taken in each step for this to be implemented. Methodically plan the progression of improvements. This involves identifying potential enhancements in the script and devising a roadmap for incremental development. Each step of the plan should specificy which iteration should tackle this step. Ensure each iteration is handing its planned step.
+Non-repetitive Progression: Ensure that each iteration of the script brings new improvements. Avoid suggesting or implementing the same changes in consecutive iterations.
+Functional Code Production: All code modifications and additions must be fully operational. Refrain from using placeholder comments for brevity or temporary file paths that are not executable. Also, ensure that functions you add are actually utilized.
+
+Code Overview: The 'self_improve.py' script operates in a self-enhancement loop, leveraging GPT for its own code optimization. Key functions include:
+
+next_iteration: Sends the current script and tasks to GPT for improvement suggestions.
+extract_python_code: Extracts Python code blocks from GPT's responses.
+update_code: Integrates GPT's code suggestions into 'self_improve.py'.
+The main loop: Repeatedly requests feedback from GPT and applies code enhancements.
+Operational Note: At the end of each loop, the system undergoes a basic coding test. If it fails, the system will revert to its previous state. Ensure the script remains functional after each iteration.
+
+ONLY PLAN AND COMPLETE THIS TASK
+Write a new logging function that instead saves the logs in json format where each log is individual item.

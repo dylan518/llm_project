@@ -21,6 +21,45 @@ for directory in MODULE_DIRECTORIES:
 
 from llm_request import LLMRequester
 
+def convert_existing_logs_to_json():
+    log_file_path = os.path.join(os.environ.get('PROJECT_DIRECTORY'), 'self_improvement/log_file.log')
+    json_log_file_path = log_file_path.replace('.log', '.json')
+    messages = []
+    try:
+        with open(log_file_path, 'r') as file:
+            for line in file:
+                log_parts = line.split(' - ')
+                if len(log_parts) == 3:
+                    category, timestamp, message = log_parts
+                    message_json = {'timestamp': timestamp, 'type': category.strip('[]'), 'message': message.strip()}
+                    messages.append(message_json)
+    except Exception as e:
+        print(f'An error occurred while converting existing logs: {str(e)}')
+    write_logs_to_json_file(messages, json_log_file_path)
+
+def write_logs_to_json_file(messages, json_log_file_path):
+    import os
+    import json
+    os.makedirs(os.path.dirname(json_log_file_path), exist_ok=True)
+    try:
+        with open(json_log_file_path, 'a') as file:
+            for message in messages:
+                json.dump(message, file)
+                file.write('\n')
+    except Exception as e:
+        print(f'An error occurred while writing logs to JSON file: {str(e)}')
+
+def log_iteration_activity_json(messages, message_content, log_category='info', current_iteration=None, total_iterations=None):
+    import datetime
+    import json
+    timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    log_entry = {'timestamp': timestamp, 'type': log_category.upper(), 'message': message_content}
+    if current_iteration is not None and total_iterations is not None:
+        log_entry['iteration_info'] = f'Iteration {current_iteration} of {total_iterations}'
+    messages.append(log_entry)
+    print(json.dumps(log_entry, indent=4))
+    return log_entry
+
 
 def collect_logs(log_file_path, logs_start_token):
     try:
@@ -174,50 +213,67 @@ def extract_function_definitions(code):
 
     return func_defs
 
-
 #updates code in self_improve.py
 def update_code(func, target_file):
-    """
-    Integrate the code suggestion from the AI response into the self_improve.py file.
-
-    Parameters:
-    - func (str): The function code to be added or updated in the target file.
-    - target_file (str): The path to the target file that needs to be updated.
-    """
     try:
         tree = ast.parse(func)
-        func_name = tree.body[0].name if tree.body else None
-        if not func_name:
-            return 'Error: No valid function name found in the provided code.'
-        with open(target_file, 'r') as file:
-            target_code_lines = file.readlines()
-        func_start_index = None
-        func_end_index = None
-        for (index, line) in enumerate(target_code_lines):
-            if line.strip().startswith('def ' + func_name):
-                func_start_index = index
-                for end_index in range(index + 1, len(target_code_lines)):
-                    if target_code_lines[end_index].strip() and (
-                            not target_code_lines[end_index].startswith('    ')
-                    ):
-                        func_end_index = end_index
+        for node in tree.body:
+            if isinstance(node, ast.FunctionDef):
+                func_name = node.name
+                with open(target_file, 'r') as file:
+                    data = file.readlines()
+                func_start = None
+                func_end = None
+                indent_level = None
+                for (index, line) in enumerate(data):
+                    stripped = line.lstrip()
+                    indent = len(line) - len(stripped)
+                    if stripped.startswith(f'def {func_name}'):
+                        func_start = index
+                        indent_level = indent
+                    elif func_start is not None and indent <= indent_level and stripped:
+                        func_end = index
                         break
-                if not func_end_index:
-                    func_end_index = len(target_code_lines)
-                break
-        if func_start_index is not None:
-            new_code = target_code_lines[:func_start_index] + [
-                func
-            ] + target_code_lines[func_end_index:]
-            log_iteration_activity([],
-                                   f'Updating existing function: {func_name}')
-        else:
-            new_code = target_code_lines + [func]
-            log_iteration_activity([], f'Adding new function: {func_name}')
-        with open(target_file, 'w') as file:
-            file.writelines(new_code)
+                if func_start is not None:
+                    existing_func_snippet = ''.join(data[func_start:func_end])
+                    snippet_length = len(existing_func_snippet)
+                    if snippet_length > 20:
+                        existing_func_snippet_start = existing_func_snippet[:
+                                                                            10]
+                        existing_func_snippet_end = existing_func_snippet[-10:]
+                        log_iteration_activity(
+                            [],
+                            f'Replacing function: {existing_func_snippet_start}...{existing_func_snippet_end}'
+                        )
+                    else:
+                        log_iteration_activity(
+                            [], f'Replacing function: {existing_func_snippet}')
+                    data[func_start:func_end] = [func + '\n']
+                else:
+                    snippet_length = len(func)
+                    if snippet_length > 20:
+                        log_iteration_activity(
+                            [],
+                            f'Adding new function: {func[:10]}...{func[-10:]}')
+                    else:
+                        log_iteration_activity([],
+                                               f'Adding new function: {func}')
+                    insert_index = 0
+                    for (i, line) in enumerate(data):
+                        if line.startswith('import ') or line.startswith(
+                                'from '):
+                            insert_index = i + 1
+                    data.insert(insert_index, '\n' + func + '\n')
+                new_func_snippet_start = func[:10]
+                new_func_snippet_end = func[-10:]
+                log_iteration_activity(
+                    [],
+                    f'New/Updated function: {new_func_snippet_start}...{new_func_snippet_end}'
+                )
+                with open(target_file, 'w') as file:
+                    file.writelines(data)
     except Exception as e:
-        return f'Error updating code: {e}'
+        print(f'An error occurred while updating the code: {str(e)}')
 
 
 def get_current_code(filepath):

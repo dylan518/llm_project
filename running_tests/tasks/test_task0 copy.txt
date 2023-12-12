@@ -1,0 +1,55 @@
+Prime Cycle Detection in a Graph
+Problem Statement
+In this problem, you are required to implement a function in Python that determines whether a given undirected graph contains a cycle for which the sum of the weights of the edges in the cycle is a prime number. The graph is provided as an edge list, where each edge includes its weight.
+
+Definitions and Constraints
+Graph: An undirected graph with N vertices, labeled from 1 to N.
+Edge List: A list where each element is a tuple (u, v, w) representing an edge between vertices u and v with weight w.
+Prime Number: A number greater than 1 that has no positive divisors other than 1 and itself.
+Function Signature
+```python
+def has_prime_cycle(n: int, edges: List[Tuple[int, int, int]]) -> bool:
+    """
+    Parameters:
+    n (int): The number of vertices in the graph.
+    edges (List[Tuple[int, int, int]]): A list of tuples, each representing an edge 
+                                        between two vertices and its weight.
+    
+    Returns:
+    bool: True if there exists a cycle in the graph such that the sum of the weights 
+          of the edges in the cycle is a prime number, False otherwise.
+    """
+```
+Input Format
+n: An integer representing the number of vertices in the graph.
+edges: A list of tuples. Each tuple is of the form (u, v, w) where u and v are vertex labels (integers) and w is the weight of the edge (integer).
+Output Format
+The function should return a boolean value:
+True if there exists at least one cycle in the graph for which the sum of the weights of the edges is a prime number.
+False otherwise.
+Example
+Input:
+
+```python
+n = 4
+edges = [(1, 2, 3), (2, 3, 5), (3, 4, 2), (4, 1, 3), (1, 3, 1)]
+```
+Function Execution:
+
+```python
+result = has_prime_cycle(n, edges)
+```
+Output:
+
+```python
+True```
+Explanation
+In the example given, the graph contains a cycle 1-2-3-1 with edge weights 3, 5, and 1. The sum of these weights is 9, which is not a prime number. However, the cycle 2-3-4-1-2 has weights 5, 2, 3, 3 which sum to 13, a prime number. Therefore, the function returns True.
+
+Implementation Notes
+The function should efficiently handle graphs with up to 10^3 vertices and a similar or larger number of edges.
+Efficient prime number checking and cycle detection algorithms should be used to ensure optimal performance.
+Handling edge cases, such as graphs with no cycles or single-vertex cycles, is essential for correctness.
+
+
+

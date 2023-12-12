@@ -1,7 +1,6 @@
 
 ** TASK: **
-Write a new logging function that instead saves the logs in json format where each log is individual item.
-
+Write a function that uses regex to find gpt out-put with bash and have it run anything in the bash markdown. This should allow gpt to run bash commands.
 Strategic Planning: In the first message create a plan that will describe the actions that should be taken in each step for this to be implemented. Methodically plan the progression of improvements. This involves identifying potential enhancements in the script and devising a roadmap for incremental development. Each step of the plan should specificy which iteration should tackle this step. Ensure each iteration is handing its planned step.
 Non-repetitive Progression: Ensure that each iteration of the script brings new improvements. Avoid suggesting or implementing the same changes in consecutive iterations.
 Functional Code Production: All code modifications and additions must be fully operational. Refrain from using placeholder comments for brevity or temporary file paths that are not executable. Also, ensure that functions you add are actually utilized. Additionaly, only add one python function at a time.

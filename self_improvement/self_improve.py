@@ -21,44 +21,7 @@ for directory in MODULE_DIRECTORIES:
 
 from llm_request import LLMRequester
 
-def convert_existing_logs_to_json():
-    log_file_path = os.path.join(os.environ.get('PROJECT_DIRECTORY'), 'self_improvement/log_file.log')
-    json_log_file_path = log_file_path.replace('.log', '.json')
-    messages = []
-    try:
-        with open(log_file_path, 'r') as file:
-            for line in file:
-                log_parts = line.split(' - ')
-                if len(log_parts) == 3:
-                    category, timestamp, message = log_parts
-                    message_json = {'timestamp': timestamp, 'type': category.strip('[]'), 'message': message.strip()}
-                    messages.append(message_json)
-    except Exception as e:
-        print(f'An error occurred while converting existing logs: {str(e)}')
-    write_logs_to_json_file(messages, json_log_file_path)
 
-def write_logs_to_json_file(messages, json_log_file_path):
-    import os
-    import json
-    os.makedirs(os.path.dirname(json_log_file_path), exist_ok=True)
-    try:
-        with open(json_log_file_path, 'a') as file:
-            for message in messages:
-                json.dump(message, file)
-                file.write('\n')
-    except Exception as e:
-        print(f'An error occurred while writing logs to JSON file: {str(e)}')
-
-def log_iteration_activity_json(messages, message_content, log_category='info', current_iteration=None, total_iterations=None):
-    import datetime
-    import json
-    timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    log_entry = {'timestamp': timestamp, 'type': log_category.upper(), 'message': message_content}
-    if current_iteration is not None and total_iterations is not None:
-        log_entry['iteration_info'] = f'Iteration {current_iteration} of {total_iterations}'
-    messages.append(log_entry)
-    print(json.dumps(log_entry, indent=4))
-    return log_entry
 
 
 def collect_logs(log_file_path, logs_start_token):
@@ -335,8 +298,9 @@ def parse_AI_response_and_update(response, file):
                 for func_def in func_defs:
                     try:
                         ast.parse(func_def)
+                        update_code(func_def, file)
+                        code=get_current_code(file)
                         if eval_python_code(func_def):
-                            update_code(func_def, file)
                             code_updated = True
                         else:
                             restore_code(file)
@@ -383,7 +347,7 @@ def main():
     start_token = 'Self-improvement loop started!'
     log_iteration_activity([], start_token)
     messages = []
-    iterations = 3
+    iterations = 6
     for i in range(iterations):
         log_iteration_activity([],
                                'Starting iteration',

@@ -1,11 +1,20 @@
-Task: Palindrome Checker
+Prime Cycle Detection in a Graph
+Problem Statement
+In this problem, you are required to implement a function in Python that determines whether a given undirected graph contains a cycle for which the sum of the weights of the edges in the cycle is a prime number. The graph is provided as an edge list, where each edge includes its weight.
 
-Your task is to develop a function that checks if a given string is a palindrome. A palindrome is a word, phrase, number, or other sequences of characters that reads the same forward and backward (ignoring spaces, punctuation, and capitalization).
+Increase the effciency of the current implementation.
 
-Specifications:
 
-Palindrome Checker:
-Write a function named is_palindrome(s: str) -> bool that takes in a string s and returns True if it's a palindrome and False otherwise.
-Constraints:
-The function should ignore spaces, punctuation, and capitalization when determining if a string is a palindrome.
-The function should be efficient and handle strings of varying lengths.
+
+Strategic Planning: In the first message create a plan that will describe the actions that should be taken in each step for this to be implemented. Methodically plan the progression of improvements. This involves identifying potential enhancements in the script and devising a roadmap for incremental development. Each step of the plan should specificy which iteration should tackle this step. Ensure each iteration is handing its planned step.
+Non-repetitive Progression: Ensure that each iteration of the script brings new improvements. Avoid suggesting or implementing the same changes in consecutive iterations.
+Functional Code Production: All code modifications and additions must be fully operational. Refrain from using placeholder comments for brevity or temporary file paths that are not executable. Also, ensure that functions you add are actually utilized. Additionaly, only add one python function at a time.
+Chain of though: At the end of your code leave brief instructions for the next iteration to complete the next step in the plan.
+
+Code Overview: The 'self_improve.py' script operates in a self-enhancement loop, leveraging GPT for its own code optimization. Key functions include:
+
+next_iteration: Sends the current script and tasks to GPT for improvement suggestions.
+extract_python_code: Extracts Python code blocks from GPT's responses.
+update_code: Integrates GPT's code suggestions into 'self_improve.py'.
+The main loop: Repeatedly requests feedback from GPT and applies code enhancements.
+Operational Note: At the end of each loop, the system undergoes a basic coding test. If it fails, the system will revert to its previous state. Ensure the script remains functional after each iteration.

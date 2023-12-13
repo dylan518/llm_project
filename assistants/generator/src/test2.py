@@ -1,5 +1,9 @@
 import openai
 
+#Create a master agent
+#Give it the ability to create sub agents
+
+
 # Define the HAAS Agent class
 class HAASAgent:
     def __init__(self, name, instructions, level, model, tools, api_key, parent_id=None):
@@ -75,7 +79,7 @@ def initialize_haas_system(api_key, root_model, root_tools):
 
 # Main function to run the HAAS system
 def main():
-    api_key = "your-openai-api-key"  
+    api_key = "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"  
     root_model = "gpt-4-1106-preview"  
     root_tools = [{"type": "code_interpreter"}]  
     # Initialize the system

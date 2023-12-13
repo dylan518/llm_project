@@ -1,0 +1,11 @@
+C:\Users\alexa\Desktop\ai-code-gen\llm_project\assistants-tester\generator\target\debug\deps\libsocket2-406110d932ded3cb.rmeta: C:\Users\alexa\.cargo\registry\src\index.crates.io-6f17d22bba15001f\socket2-0.5.5\src\lib.rs C:\Users\alexa\.cargo\registry\src\index.crates.io-6f17d22bba15001f\socket2-0.5.5\src\sockaddr.rs C:\Users\alexa\.cargo\registry\src\index.crates.io-6f17d22bba15001f\socket2-0.5.5\src\socket.rs C:\Users\alexa\.cargo\registry\src\index.crates.io-6f17d22bba15001f\socket2-0.5.5\src\sockref.rs C:\Users\alexa\.cargo\registry\src\index.crates.io-6f17d22bba15001f\socket2-0.5.5\src\sys\windows.rs
+
+C:\Users\alexa\Desktop\ai-code-gen\llm_project\assistants-tester\generator\target\debug\deps\libsocket2-406110d932ded3cb.rlib: C:\Users\alexa\.cargo\registry\src\index.crates.io-6f17d22bba15001f\socket2-0.5.5\src\lib.rs C:\Users\alexa\.cargo\registry\src\index.crates.io-6f17d22bba15001f\socket2-0.5.5\src\sockaddr.rs C:\Users\alexa\.cargo\registry\src\index.crates.io-6f17d22bba15001f\socket2-0.5.5\src\socket.rs C:\Users\alexa\.cargo\registry\src\index.crates.io-6f17d22bba15001f\socket2-0.5.5\src\sockref.rs C:\Users\alexa\.cargo\registry\src\index.crates.io-6f17d22bba15001f\socket2-0.5.5\src\sys\windows.rs
+
+C:\Users\alexa\Desktop\ai-code-gen\llm_project\assistants-tester\generator\target\debug\deps\socket2-406110d932ded3cb.d: C:\Users\alexa\.cargo\registry\src\index.crates.io-6f17d22bba15001f\socket2-0.5.5\src\lib.rs C:\Users\alexa\.cargo\registry\src\index.crates.io-6f17d22bba15001f\socket2-0.5.5\src\sockaddr.rs C:\Users\alexa\.cargo\registry\src\index.crates.io-6f17d22bba15001f\socket2-0.5.5\src\socket.rs C:\Users\alexa\.cargo\registry\src\index.crates.io-6f17d22bba15001f\socket2-0.5.5\src\sockref.rs C:\Users\alexa\.cargo\registry\src\index.crates.io-6f17d22bba15001f\socket2-0.5.5\src\sys\windows.rs
+
+C:\Users\alexa\.cargo\registry\src\index.crates.io-6f17d22bba15001f\socket2-0.5.5\src\lib.rs:
+C:\Users\alexa\.cargo\registry\src\index.crates.io-6f17d22bba15001f\socket2-0.5.5\src\sockaddr.rs:
+C:\Users\alexa\.cargo\registry\src\index.crates.io-6f17d22bba15001f\socket2-0.5.5\src\socket.rs:
+C:\Users\alexa\.cargo\registry\src\index.crates.io-6f17d22bba15001f\socket2-0.5.5\src\sockref.rs:
+C:\Users\alexa\.cargo\registry\src\index.crates.io-6f17d22bba15001f\socket2-0.5.5\src\sys\windows.rs:

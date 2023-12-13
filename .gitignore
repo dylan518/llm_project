@@ -19,3 +19,6 @@ __pycache__/
 
 # If you are using SQLite
 *.sqlite
+
+assistants-tester/generator/target/
+

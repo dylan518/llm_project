@@ -1,0 +1,74 @@
+Key Components:
+Function Definition:
+
+Each function is defined as an object within the tools array.
+"type": "function" indicates that the tool is a function.
+Function Properties:
+
+"name": The unique identifier of the function.
+"description": A brief explanation of what the function does.
+Parameters:
+
+The "parameters" object describes the expected inputs for the function.
+"type": "object" indicates that the parameters are passed as an object.
+Properties:
+
+Within "properties", each parameter is defined with its type, description, and other relevant properties.
+"type": Data type of the parameter ("string", "integer", etc.).
+"description": Explanation of what the parameter represents.
+Additional attributes like "enum" for string type (to specify allowed values), or "minimum" and "maximum" for numeric types.
+Required Parameters:
+
+"required" is an array listing all parameters that must be provided for the function to work correctly.
+
+Example:
+tools = [
+    {
+        "type": "function",
+        "function": {
+            "name": "get_current_weather",
+            "description": "Get the current weather",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "location": {
+                        "type": "string",
+                        "description": "The city and state, e.g. San Francisco, CA",
+                    },
+                    "format": {
+                        "type": "string",
+                        "enum": ["celsius", "fahrenheit"],
+                        "description": "The temperature unit to use. Infer this from the users location.",
+                    },
+                },
+                "required": ["location", "format"],
+            },
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "get_n_day_weather_forecast",
+            "description": "Get an N-day weather forecast",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "location": {
+                        "type": "string",
+                        "description": "The city and state, e.g. San Francisco, CA",
+                    },
+                    "format": {
+                        "type": "string",
+                        "enum": ["celsius", "fahrenheit"],
+                        "description": "The temperature unit to use. Infer this from the users location.",
+                    },
+                    "num_days": {
+                        "type": "integer",
+                        "description": "The number of days to forecast",
+                    }
+                },
+                "required": ["location", "format", "num_days"]
+            },
+        }
+    },
+]

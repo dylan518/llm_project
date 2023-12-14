@@ -1,8 +1,8 @@
 from langchain.agents.openai_assistant import OpenAIAssistantRunnable
 from langchain.agents import AgentExecutor
-from langchain.tools import DuckDuckGoSearchRun
-from langchain.tools import DynamicTool
+from langchain.tools import DuckDuckGoSearchRun, DynamicTool
 import langchain.tools as tools
+import { DynamicTool } from tools
 
 # Function to create a new assistant
 def create_new_assistant(input_dict):

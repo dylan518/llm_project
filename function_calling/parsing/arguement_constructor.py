@@ -132,7 +132,8 @@ class ArgumentConstructor:
                     continue
         raise ValueError("Unable to parse and validate input") 
     
-    def lenient_json_parse(self, raw_input):
+
+    def lenient_json_parse(self, raw_input, schema_parser, function_name):
         try:
             parsed_json = json.loads(raw_input)
         except json.JSONDecodeError:
@@ -143,4 +144,3 @@ class ArgumentConstructor:
         validated_json = schema_parser.validate_and_format_arguments(function_name, parsed_json)
         return validated_json
 
-  

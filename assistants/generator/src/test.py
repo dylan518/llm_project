@@ -4,11 +4,21 @@ import time
 # Initialize the client
 client = openai.OpenAI()
 
+# Define a function to create an assistant
+def create_assistant(name, instructions, tools, model):
+    return client.beta.assistants.create(
+        name=name,
+        instructions=instructions,
+        tools=tools,
+        model=model
+    )
+
+
 # Step 1: Create an Assistant
-assistant = client.beta.assistants.create(
-    name="Math Tutor",
-    instructions="You are a personal math tutor. Write and run code to answer math questions.",
-    tools=[{"type": "code_interpreter"}],
+assistant = create_assistant(
+    name="Assistant Creator",
+    instructions="You can create other assistants. To do so, specify the name, instructions, tools, and model. The user will prompt you for a basic structure of other assistants you are to create and their behavior.",
+    tools=[{"type": "function", "function": {"name": "create_assistant"}}],
     model="gpt-4-1106-preview"
 )
 
@@ -19,14 +29,14 @@ thread = client.beta.threads.create()
 message = client.beta.threads.messages.create(
     thread_id=thread.id,
     role="user",
-    content="I need to solve the equation `3x + 11 = 14`. Can you help me?"
+    content="Can you create another assistant that is instructred to be a math helper?"
 )
 
 # Step 4: Run the Assistant
 run = client.beta.threads.runs.create(
     thread_id=thread.id,
     assistant_id=assistant.id,
-    instructions="Please address the user as Jane Doe. The user has a premium account."
+    instructions="Please address the user as Alex. The user has a premium account."
 )
 
 print(run.model_dump_json(indent=4))

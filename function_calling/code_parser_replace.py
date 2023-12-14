@@ -4,11 +4,15 @@ import py_compile
 import tempfile
 from typing import List
 from pydantic import BaseModel, Field, validator, ValidationError
-from code_modifier import CodeModifier
+from langchain.output_parsers import OutputFixingParser, PydanticOutputParser
+from langchain.llms import OpenAI
+from langchain.prompts import PromptTemplate
+import textwrap
+import json
 
 class CodeModifier:
 
-    def __init__(self, filepath):
+    def __init__(self, filepath="test_file.py"):
         self.filepath = filepath
 
     def apply_modifications(self, modifications):
@@ -30,23 +34,13 @@ class CodeModifier:
         with open(self.filepath, 'w') as file:
             file.writelines(lines)
 
-    def check_code_compiles(self, modifications):
-        with tempfile.TemporaryDirectory() as temp_dir:
-            temp_file_path = os.path.join(temp_dir, "temp_file.py")
-            shutil.copyfile(self.filepath, temp_file_path)
-            # Create a new CodeModifier instance for the temporary file
-            temp_modifier = CodeModifier(temp_file_path)
-            print(f"Applied modifications\n{modifications}")
-            temp_modifier.apply_modifications(modifications)
+    def check_code_compiles(self):
             try:
-                py_compile.compile(temp_file_path, doraise=True)
+                py_compile.compile(self.filepath, doraise=True)
                 return True
             except py_compile.PyCompileError as e:
-                print(f"Compilation error: {e}")
-                return False
-
+                raise 
 class CodeModification(BaseModel):
-
     class Modification(BaseModel):
         line_number: List[int] = Field(..., description="A list containing the start and end line numbers for the replacement range.")
         code: str = Field(..., description="The new code that will replace the code in the specified line range.")
@@ -64,41 +58,25 @@ class CodeModification(BaseModel):
             if not v.strip():
                 raise ValueError("code must be a non-empty string")
             return v
-    
-    modifications: List[Modification] = Field(..., description="List of code modifications.")
+
+    modifications: List[dict] = Field(..., description="List of code modifications.")
+
+    def __init__(self,  **data):
+        # Unpack the modifications from data to create Modification instances
+        super().__init__(**data) 
+        mod_dicts = data.get('modifications', [])
+        self.modifications = [self.Modification(**mod) for mod in mod_dicts]
+        self.check_compilation()
+
+    def check_compilation(self):
+        compiler = CodeModifier()  # Use a local variable for the compiler
+        for mod in self.modifications:
+            compiler.apply_modifications([mod.dict()])  # Convert each Modification instance to a dict
+            compiler.check_code_compiles()
+
 
     class Config:
         arbitrary_types_allowed = True
-
-    def initialize_modifier(self, file_path: str):
-            self._modifier = CodeModifier(file_path)
-    
-    @validator("modifications", pre=True)
-    def validator(cls, modifications, values, **kwargs):
-        if not isinstance(modifications, list):
-            raise ValueError("modifications should be a list of modification objects")
-
-        mod_instances = []
-        for modification_dict in modifications:
-            # Check if 'code' key exists and is not empty
-            if 'code' not in modification_dict or not modification_dict['code'].strip():
-                raise ValueError("Each modification must include a non-empty 'code' string")
-
-            # Replace escaped newline and tab characters
-            modification_dict['code'] = modification_dict['code'].replace('\\n', '\n').replace('\\t', '\t')
-
-            try:
-                # Create Modification instance and add to the list
-                mod_instance = cls.Modification(**modification_dict)
-                mod_instances.append(mod_instance)
-            except ValidationError as e:
-                raise ValueError(f"Invalid modification format: {e}")
-
-        # Assuming modifier initialization is handled elsewhere, such as in a post-init method
-        if hasattr(cls, '_modifier') and not cls._modifier.check_code_compiles(mod_instances):
-            raise ValueError("Modification causes compile failure")
-
-        return modifications
 
     @staticmethod
     def get_format_instructions():
@@ -107,11 +85,15 @@ class CodeModification(BaseModel):
             "format": '{"modifications": [{"line_number": [start_line, end_line], "code": "replacement code string"}, ...]}'
         }
 
+
 class ModificationGenerator:
 
     def __init__(self, filepath,openai_key):
         self.filepath = filepath
+        self.test_file_path = "test_file.py"
         self.modifier = CodeModifier(filepath)
+        os.environ[
+            "OPENAI_API_KEY"] = "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"
         self.llm_gpt3 = OpenAI(temperature=0, model_name='gpt-4-1106-preview')
         self.parser = PydanticOutputParser(pydantic_object=CodeModification)
         self.fixer = OutputFixingParser.from_llm(parser=self.parser, llm=self.llm_gpt3)
@@ -129,7 +111,7 @@ class ModificationGenerator:
 
             [
                 {{
-                    "line_number": [start_line, end_line],
+                    \n "line_number":\n [start_line, end_line],
                     "code": "replacement code here"
                 }},
                 ... more modifications
@@ -139,22 +121,28 @@ class ModificationGenerator:
         """)
         return query
     
-    def extract_json_from_output(self, output):
+        
+    def write_to_file(self,code,file_path="test_file.py"):
+        # Create a test file with the read content or empty content
         try:
-            # Find JSON boundaries
-            start_idx = output.index('```json') + len('```json\n')
-            end_idx = output.rindex('\n```')
-            json_str = output[start_idx:end_idx]
+            with open(file_path, 'w') as file:
+                file.write(code)
+        except Exception as e:
+            print(f"Error writing to file {file_path}: {e}. Using empty content.")
+            code_content = ""
+    
+    def read_from_file(self,file_path):
+        try:
+            with open(file_path, 'r') as file:
+                code_content = file.read()
+            return code_content
+        except Exception as e:
+            print(f"Error reading file {file_path}: {e}. Using empty content.")
+            return ""
 
-            # Convert actual newlines in the JSON string to escaped newlines
-            json_str = json_str.replace('\n', '\\n').replace('\t', '\\t')
-
-            return json_str
-        except ValueError:
-            print("Unable to find JSON markers in the output.")
-            return output
-
-    def generate_modifications(self, messages, code):
+    def generate_modifications(self, messages):
+        # Construct the query
+        code=self.read_from_file(self.filepath) 
         query = self.construct_query(messages, code)
 
         prompt = PromptTemplate(
@@ -169,21 +157,15 @@ class ModificationGenerator:
 
         # Generate the response
         response = self.llm_gpt3.generate(prompts=[_input.to_string()])
-
-        # Extract the output text from the response
-        response = self.llm_gpt3.generate(prompts=[_input.to_string()])
-
         # Extract the output text from the response
         if response.generations:
             output = response.generations[0][0].text  # Accessing the first Generation object's text
         else:
             output = ""
+        
+        self.write_to_file(code)
 
-        output = output.replace('\\n', '\n').replace('\\t', '\t')  # Fix escaped characters
-        output=self.extract_json_from_output(output)
-        print(output)
-
-
+        
         try:
             parsed_output = self.parser.parse(output)
             return parsed_output
@@ -194,5 +176,5 @@ class ModificationGenerator:
                 return self.parser.parse(fixed_output)
             except Exception as ex:
                 print(f"Failed to fix and parse output: {ex}")
-        return None
+        return None  
 

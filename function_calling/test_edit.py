@@ -1,9 +1,7 @@
-
 import unittest
 import os
 from code_parser_replace import CodeModifier, CodeModification, ModificationGenerator
-from langchain.llms import OpenAI
-from unittest.mock import patch
+
 # Assuming CodeModifier and CodeModification are defined as above
 
 class TestCodeModifier(unittest.TestCase):
@@ -33,25 +31,21 @@ class TestCodeModifier(unittest.TestCase):
         modifications = [
             {'line_number': [1, 1], 'code': "print('Goodbye, world!')"}
         ]
-        self.assertTrue(modifier.check_code_compiles())
+        self.assertTrue(modifier.check_code_compiles(modifications))
 
-
-"""
 class TestCodeModification(unittest.TestCase):
 
     def test_validate_modifications(self):
         valid_modifications = {
             "modifications": [
-                {"line_number": [1, 1], "code": "print('Test')"},
-                {"line_number": [3, 3], "code": "x = 5"},
-                {"line_number": [5, 5], "code": "y = x * 2"}
+                {"line_number": [1, 1], "code": "print('Test')"}
             ]
         }
         try:
             code_modification = CodeModification(file_path="test_file.py", **valid_modifications)
         except Exception as e:
             self.fail(f"CodeModification validation failed with exception: {e}")
-    
+
     def test_invalid_modifications(self):
         invalid_modifications = {
             "modifications": [
@@ -63,25 +57,35 @@ class TestCodeModification(unittest.TestCase):
 
 class TestModificationGenerator(unittest.TestCase):
 
-  # Replace with the actual module name
-    def test_generate_modifications_with_mocked_output(self):
-        # Define a mock response with perfectly formatted JSON
+    def setUp(self):
+        # Create a test file
+        self.test_file_path = "example_script.py"
+        with open(self.test_file_path, "w") as file:
+            file.write("def greet(name):\n    print(f'Hello, {name}')\n\ngreet('World')\n")
 
-        # Create an instance of ModificationGenerator
-        generator = ModificationGenerator(filepath="test_file.py", openai_key="test_key")
+        # Initialize ModificationGenerator with the test file path
+        self.mod_generator = ModificationGenerator(filepath=self.test_file_path, openai_key="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")
 
-        # Mock input messages and code
-        messages = ["Refactor the code"]
-        code = "Original code content"
+    def tearDown(self):
+        # Clean up after test
+        os.remove(self.test_file_path)
 
-        # Call the generate_modifications method
-        result = generator.generate_modifications(messages, code)
+    def test_generate_modifications(self):
+        # Example messages and code changes
+        messages = ["Change the greeting message to 'Welcome'"]
+        code = "def greet(name):\n    print(f'Hello, {name}')\n\ngreet('World')\n"
 
-        # Assertions to check if the result is as expected
-        self.assertIsNotNone(result)
-"""
-class TestModificationGenerator(unittest.TestCase):
+        # Generate modifications
+        modifications = self.mod_generator.generate_modifications(messages, code)
 
+        # Apply modifications if any
+        if modifications and modifications.modifications:
+            self.mod_generator.modifier.apply_modifications([mod.dict() for mod in modifications.modifications])
+
+            # Check if the modifications were applied
+            with open(self.test_file_path, "r") as file:
+                content = file.read()
+            self.assertIn("Welcome", content)
 
     def setUp(self):
         # Create a test file with the original script
@@ -114,11 +118,9 @@ class TestModificationGenerator(unittest.TestCase):
             "        return n * factorial(n - 1)\n\n"
             "print(factorial(5))\n"
         )
-        with open(self.test_file_path, 'w') as test_file:
-            test_file.write(code)
 
         # Generate modifications
-        modifications = self.mod_generator.generate_modifications(messages,)
+        modifications = self.mod_generator.generate_modifications(messages, code)
 
         # Apply modifications if any
         if modifications and modifications.modifications:
@@ -128,7 +130,6 @@ class TestModificationGenerator(unittest.TestCase):
             with open(self.test_file_path, "r") as file:
                 modified_content = file.read()
                 print("Modified Content:\n", modified_content)
-
 
 # Run the tests
 if __name__ == '__main__':

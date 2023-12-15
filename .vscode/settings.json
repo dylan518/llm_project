@@ -1,5 +1,8 @@
 {
     "python.linting.pylintArgs": [
         "--disable=E0401"
+    ],
+    "python.analysis.extraPaths": [
+        "./llm_requests"
     ]
 }

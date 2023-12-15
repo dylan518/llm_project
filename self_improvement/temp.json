@@ -1,5 +1,5 @@
 {
-    "task":"Prime Cycle Detection in a Graph.",
+    "task":"Write a function that tests if a string is a palindrome.",
     "project_directory":"C:\\Users\\dylan\\Documents\\GitHub\\llm_project\\",
     "target_file":"C:\\Users\\dylan\\Documents\\GitHub\\llm_project\\self_improvement\\test_file.py",
     "usage":"To add python functions to the codefile generate Python functions in this format:\n\n```python\ndef example_function():\n    print('This is a simple example function that prints out a message.')\n```\n\nensure def is directly after python and that ```python and ``` are on their own lines. There should be nothing before or after the function. All imports will automatically be handled; don't add imports.\nExisting functions will be replaced, and new ones added. This is the code of the target file."

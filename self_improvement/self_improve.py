@@ -1,22 +1,14 @@
+
 import os
 import sys
-import json
-import shutil
-import re
-import sqlite3
-
-
-
-
-    
 from python_extraction import ModificationGenerator
-from database_mannager import Database_Mannager
+from improvement_loop_logger import MainLoopLogger
 
 def add_custom_packages_to_path():
     """
     since outside of working directory must add costum modules to path
     """
-    database=Database_Mannager()
+    database=MainLoopLogger()
     MODULE_DIRECTORIES = ["llm_requests", "running_tests"]
     for directory in MODULE_DIRECTORIES:
         sys.path.append(os.path.join(database.get_static_variable("project_directory"),
@@ -30,7 +22,7 @@ from llm_request import LLMRequester
 
 class improvement_loop:
     def __init__(self):
-        self.database=Database_Mannager()
+        self.database=MainLoopLogger()
         
     def get_current_code(self):
         try:
@@ -49,7 +41,7 @@ class improvement_loop:
         Formats the logs for GPT-4.
         """
         try:
-            logs=self.database.get_logs()
+            logs=self.database.get_iteration_logs()
             gpt_formatted_logs = [
                 {"role": "user", "content": " - ".join([f"{key}: {log[key]}" for key in log])}
                 for log in logs

@@ -169,7 +169,7 @@ class Draft7Schema(BaseModel):
 class SchemaGenerator:
 
     def __init__(self,llm_model):
-        self.llm_model = OpenAI(temperature=0, model_name=llm_model)
+        self.llm_model =llm_model
         self.parser = PydanticOutputParser(pydantic_object=Draft7Schema)
         self.fixer = OutputFixingParser.from_llm(parser=self.parser, llm=self.llm_model)
         self.schemas = {}
@@ -185,6 +185,7 @@ class SchemaGenerator:
     def save_schemas(self, request, schema):
         # Update the schemas dictionary with the new schema using the request as the key
         self.schemas[request] = schema
+        print(f"Saving schema for request: {request}")
 
         # Write the updated schemas dictionary to the file
         with open("schemas.json", 'w') as file:
@@ -236,20 +237,29 @@ class SchemaGenerator:
     def produce_schema(self, request):
         # Use the request (prompt) as the key to check for existing schema
         if request in self.schemas:
-            print("Returning existing schema for the prompt.")
-            return self.schemas[request]
-
-        # Generate a new schema if it doesn't exist for this prompt
-        try:
-            new_schema = self.generate_draft_7(request)
-            if new_schema:
-                # Store the new schema with the request (prompt) as the key
-                self.save_schemas(request, new_schema)
-                return new_schema
-            else:
-                print("Failed to generate a valid schema.")
-        except Exception as e:
-            print(f"Error during schema generation: {e}")
+            # Load the schema data from self.schemas
+            schema_json = self.schemas[request]
+            try:
+                # Convert the JSON string back to a dictionary
+                schema_data = json.loads(schema_json)
+                # Create a new instance of Draft7Schema using the loaded data
+                existing_schema = Draft7Schema(**schema_data)
+                return existing_schema
+            except PydanticValidationError as e:
+                print(f"Error loading existing schema: {e}")
+        else:
+            # Generate a new schema if it doesn't exist for this prompt
+            try:
+                new_schema = self.generate_draft_7(request)
+                schema_data=new_schema.to_json()
+                if new_schema:
+                    # Store the new schema with the request (prompt) as the key
+                    self.save_schemas(request, schema_data)
+                    return new_schema
+                else:
+                    print("Failed to generate a valid schema.")
+            except Exception as e:
+                print(f"Error during schema generation: {e}")
 
         return None
 

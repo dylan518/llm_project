@@ -1,16 +1,17 @@
 import langchain.llms as llms
 from datamodel_code_generator import InputFileType, generate
-from datamodel_code_generator.parser.jsonschema import JsonSchemaParser
 import json
-import sys
-from pydantic import BaseModel
 import tempfile
 import importlib.util
-import os
+from generate_draft_7 import SchemaGenerator
+from langchain.prompts import PromptTemplate
+from pydantic import ValidationError
+
+
 class ResponseGenerator:
-    def __init__(self,openai_key,model_name):
-        self.llm_gpt = llms.OpenAI()
-        self.schema_generator = schema_generator
+    def __init__(self,llm_model):
+        self.llm_model = llm_model
+        self.schema_generator = SchemaGenerator(llm_model)
         self.generated_model = None
 
     def load_schema_to_pydantic(self, request):
@@ -34,3 +35,38 @@ class ResponseGenerator:
             self.generated_model = getattr(generated_module, 'MainModel', None)
         
         return self.generated_model
+    
+    def construct_template(self):
+        # Construct the prompt
+        self.generated_model.get_format_instructions()
+        prompt = PromptTemplate(
+            template="Based off of this task: \n{query}\nRequest: \n{format_instructions}\n",
+            input_variables=["query"],
+        )
+        return prompt
+    
+    def generate_draft_7(self, request):
+        # Construct the query
+        prompt = self.construct_template()
+        # Make request
+        _input = prompt.format_prompt(query=request)
+        print(_input.to_string())
+
+        # Generate the response
+        response = self.llm_model.generate(prompts=[_input.to_string()])
+        
+        # Extract the output text from the response
+        output = response.generations[0][0].text if response.generations else ""
+        print(output)
+        
+        if self.generated_model:
+            try:
+                # Parse the output using the generated Pydantic model
+                parsed_output = self.generated_model.parse_raw(output)
+                return parsed_output
+            except ValidationError as e:
+                print(f"Failed to parse output: {e}")
+                # Additional error handling or fixing logic
+        else:
+            print("No generated model available for parsing.")
+        return None

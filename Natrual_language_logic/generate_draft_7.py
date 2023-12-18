@@ -234,7 +234,7 @@ class SchemaGenerator:
                 print(f"Failed to fix and parse output: {ex}")
         return None  
     
-    def produce_schema(self, request):
+    def produce_draft_7_schema(self, request):
         # Use the request (prompt) as the key to check for existing schema
         if request in self.schemas:
             # Load the schema data from self.schemas

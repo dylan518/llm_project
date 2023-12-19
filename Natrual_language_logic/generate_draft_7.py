@@ -168,10 +168,11 @@ class Draft7Schema(BaseModel):
 
 class SchemaGenerator:
 
-    def __init__(self,llm_model):
+    def __init__(self,llm_model,chat_model):
         self.llm_model =llm_model
+        self.chat_model=chat_model
         self.parser = PydanticOutputParser(pydantic_object=Draft7Schema)
-        self.fixer = OutputFixingParser.from_llm(parser=self.parser, llm=self.llm_model)
+        self.fixer = OutputFixingParser.from_llm(parser=self.parser, llm=self.chat_model)
         self.schemas = {}
         if os.path.exists("schemas.json"):
             try:
@@ -219,8 +220,8 @@ class SchemaGenerator:
             output = response.generations[0][0].text  # Accessing the first Generation object's text
         else:
             output = ""
+            print("generation error")
         
-        print(output)
         
         try:
             parsed_output = self.parser.parse(output)
@@ -235,6 +236,7 @@ class SchemaGenerator:
         return None  
     
     def produce_draft_7_schema(self, request):
+        print(self.parser.get_format_instructions())
         # Use the request (prompt) as the key to check for existing schema
         if request in self.schemas:
             # Load the schema data from self.schemas

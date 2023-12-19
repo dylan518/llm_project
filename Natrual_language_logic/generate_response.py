@@ -11,13 +11,28 @@ from pathlib import Path
 import os
 import subprocess
 from pydantic import BaseModel
+from langchain.output_parsers import OutputFixingParser, PydanticOutputParser
 
 
 class ResponseGenerator:
-    def __init__(self,llm_model):
+    def __init__(self,llm_model,chat_model):
         self.llm_model = llm_model
-        self.schema_generator = SchemaGenerator(llm_model)
-        self.generated_model = None
+        self.chat_model=chat_model
+        self.schema_generator = SchemaGenerator(llm_model,chat_model)
+        self.schema_dict=None
+        self.generated_pydantic_model = None
+        self.parser = None
+        self.fixer = None
+
+    def generate_parsers(self):
+        if self.generated_pydantic_model:
+            try:
+                self.parser = PydanticOutputParser(pydantic_object=self.generated_pydantic_model)
+                self.fixer = OutputFixingParser.from_llm(parser=self.parser, llm=self.chat_model)
+            except Exception as e:
+                print(f"Failed to generate parsers: {e}")
+        else:
+            print("No generated model available for parsing.")
     
     def wrap_root_in_object(self,json_schema):
         """
@@ -52,8 +67,11 @@ class ResponseGenerator:
 
 
     def load_schema_to_pydantic(self, request):
-        schema_json = self.schema_generator.produce_draft_7_schema(request).to_json()
+        schema = self.schema_generator.produce_draft_7_schema(request)
+        schema_json = schema.to_json()
+        print(f"schema json {schema_json}")
         schema_dict = json.loads(schema_json)
+        self.schema_dict = schema_dict
         schema_dict = self.wrap_root_in_object(schema_dict)
 
         with tempfile.NamedTemporaryFile(mode='w+', suffix='.json', delete=False) as temp_input:
@@ -61,6 +79,7 @@ class ResponseGenerator:
             temp_input.flush()
             
             output_file = Path(temp_input.name).with_suffix('.py')
+            print(f"Generating Pydantic model from schema: {temp_input.name} -> {output_file}")
 
             # Run datamodel-codegen as a Python module
             subprocess.run([
@@ -68,55 +87,79 @@ class ResponseGenerator:
                 '--input', temp_input.name,
                 '--input-file-type', 'jsonschema',
                 '--output', str(output_file)
-                # Removed '--base-class' option to use default BaseModel
             ], check=True)
 
-            # Dynamically import the generated Pydantic model
-            spec = importlib.util.spec_from_file_location("generated_module", output_file)
+            spec = importlib.util.spec_from_file_location("generated_module", str(output_file))
             generated_module = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(generated_module)
 
-            # Find the first Pydantic model in the generated module
-            for attribute_name in dir(generated_module):
-                attribute = getattr(generated_module, attribute_name)
-                if issubclass(attribute, BaseModel):
-                    self.generated_model = attribute
-                    break
+            # Directly access the StringListModel class
+            if hasattr(generated_module, 'Model'):
+                self.generated_pydantic_model = getattr(generated_module, 'Model')
+            else:
+                self.generated_pydantic_model = None
 
-        return self.generated_model
+            return self.generated_pydantic_model
 
     def construct_template(self):
         # Construct the prompt
         prompt = PromptTemplate(
-            template="Respond to this qeury in the desired format: \n{query}\n",
-            input_variables=["query"]
-        )
+            template="Return the desired value for this query in the correct format.\n{format_instructions}\n{query}\n",
+            input_variables=["query"],
+            partial_variables={"format_instructions": self.parser.get_format_instructions()},
+            )
         return prompt
     
         
     def generate_response(self, request):
+        print(f"Generating response for request: {request}")
+        # Load the schema into a Pydantic model
         self.load_schema_to_pydantic(request)
+        print(f"Loaded schema: {self.generated_pydantic_model}")
+        print(f"type of schema:{type(self.generated_pydantic_model)}")
+
+        #generate parsers
+        self.generate_parsers()
+
         # Construct the query
         prompt = self.construct_template()
+
         # Make request
         _input = prompt.format_prompt(query=request)
         print(_input.to_string())
 
+        
         # Generate the response
         response = self.llm_model.generate(prompts=[_input.to_string()])
-        
+
         # Extract the output text from the response
-        output = response.generations[0][0].text if response.generations else ""
-        print(output)
-        
-        if self.generated_model:
-            try:
-                # Parse the output using the generated Pydantic model
-                parsed_output = self.generated_model.parse_raw(output)
-                return parsed_output
-            except ValidationError as e:
-                print(f"Failed to parse output: {e}")
-                # Additional error handling or fixing logic
+        if response.generations:
+            output = response.generations[0][0].text  # Accessing the first Generation object's text
         else:
-            print("No generated model available for parsing.")
-        return None
+            output = ""
+        
+
+        try:
+            parsed_output = self.parser.parse(output)
+            return parsed_output
+        except ValueError as e:
+            print(f"Failed to parse output: {e}")
+            try:
+                fixed_output = self.fixer.parse(output)
+                return self.parser.parse(fixed_output)
+            except Exception as ex:
+                print(f"Failed to fix and parse output: {ex}")
+        return None  
+
+    
+    def generate(self,request):
+        """
+        Extracts internal data from a Pydantic model dump.
+        If the model dump contains a 'root' key, it returns the value of 'root'.
+        Otherwise, it returns the entire model dump.
+        """
+        pydantic_object=self.generate_response(request)
+        model_dump = pydantic_object.model_dump()
+        if 'root' in model_dump and isinstance(model_dump['root'], list):
+            return model_dump['root']
+        return model_dump

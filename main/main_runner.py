@@ -3,11 +3,13 @@ import unittest
 import sys
 import shutil  # Import shutil for rmtree
 
-PROJECT_DIRECTORY = PROJECT_DIRECTORY = os.sep.join(
+PROJECT_DIRECTORY = os.sep.join(
     os.path.abspath(__file__).split(os.sep)
     [:next((i for i, p in enumerate(os.path.abspath(__file__).split(os.sep))
             if 'llm_project' in p), None) +
      1]) if 'llm_project' in os.path.abspath(__file__) else None
+
+
 
 MODULE_DIRECTORIES = [
     "enviroment_setup_and_run", "running_tests", "llm_requests"

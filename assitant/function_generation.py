@@ -21,4 +21,4 @@ def read_text_file(file_path):
 
 schema=gen.generate_schema(read_text_file("schema_prompt.txt"))
 with open("schema.json", "w", encoding="utf-8") as file:
-    json.dump(schema.to_dict(), file, indent=4)
+    json.dump(schema, file, indent=4)
